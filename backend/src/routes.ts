@@ -30,7 +30,7 @@ router.post('/category', isAuthenticated, new CreateCategoryController().handle 
 
 router.get('/category', isAuthenticated, new ListCategoryController().handle )
 
-
+router.put('/order/finish', isAuthenticated, new FinishOrderController().handle )
 
 
 
