@@ -29,8 +29,8 @@ export function isAuthenticated(
     ) as Payload;
 
     //Recuperar o id do token e colocar dentro de uma variavel user_id dentro do req.
-    req.user_id = sub;
-    
+    req.user_id = sub;    
+
     return next();
 
   }catch(err){
