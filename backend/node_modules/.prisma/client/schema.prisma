@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// criar uma migration: yarn prisma migrate dev
+model User {
+  id String @id @default(uuid())
+  name String
+  email String
+  password String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("users")  
+}
+
+
+model Account{
+  id String @id @default(uuid())
+  name String
+  type String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  created_by_id String?
+  updated_by_id String?
+
+  @@map("banks")  
+}
+
+model Category{
+  id String @id @default(uuid())
+  name String
+  expense Boolean @default(true)
+  includeGoal Boolean @default(true)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  created_by String?
+  updated_by String?
+
+  @@map("categories")
+  expenses Expense[]
+  earnings Earn[]
+}
+
+model Period{
+  id String @id @default(uuid())
+  month Int
+  year Int
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  created_by String?
+  updated_by String?
+
+  @@map("periods") 
+  expenses Expense[]
+  earnings Earn[]
+  GoalPeriods GoalPeriod[]
+}
+
+model Goal{
+  id String @id @default(uuid())
+  amount Float
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  created_by String?
+  updated_by String?
+
+  @@map("goals")
+}
+
+model GoalPeriod{
+  id String @id @default(uuid())
+  amount Float
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  created_by String?
+  updated_by String?
+
+  period Period @relation(fields: [period_id], references: [id])
+
+  @@map("goalPeriods")
+  period_id String
+}
+
+model Expense{
+  id String @id @default(uuid())
+  date DateTime
+  description String?
+  value Float
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  created_by String?
+  updated_by String?
+
+  category Category @relation(fields: [category_id], references: [id])
+  period Period @relation(fields: [period_id], references: [id])
+
+  @@map("expenses")
+  category_id String
+  period_id String
+}
+
+model Earn{
+  id String @id @default(uuid())
+  date DateTime
+  description String?
+  value Float
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  created_by String?
+  updated_by String?
+
+  category Category @relation(fields: [category_id], references: [id])
+  period Period @relation(fields: [period_id], references: [id])
+
+  @@map("earn")
+  category_id String
+  period_id String
+}
