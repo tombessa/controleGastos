@@ -3,10 +3,9 @@ import { ListCategoryService } from '../../services/category/ListCategoryService
 
 class ListCategoryController{
   async handle(req: Request, res: Response){
+    const { id, name, expense, includeGoal, priority} = req.body;
     const listCategoryService = new ListCategoryService();
-
-    const category = await listCategoryService.execute();
-
+    const category = await new ListCategoryService().execute({id, name, expense, includeGoal, priority})
     return res.json(category);
 
   }

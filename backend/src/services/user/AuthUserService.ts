@@ -14,7 +14,8 @@ class AuthUserService{
     //Verificar se o email existe.
     const user = await prismaClient.user.findFirst({
       where:{
-        email: email
+        email: email,
+        active: true,
       }
     })
 

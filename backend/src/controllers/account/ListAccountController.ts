@@ -8,7 +8,6 @@ class ListAccountController{
     const listAccountService = new ListAccountService();
 
     const account = await listAccountService.execute({id,type,name});
-
     return res.json(account);
 
   }

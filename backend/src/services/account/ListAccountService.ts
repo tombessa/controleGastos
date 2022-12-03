@@ -8,57 +8,24 @@ interface AccountRequest{
 
 class ListAccountService{
   async execute({id,type,name}:AccountRequest){
-    if(id){
-      const category = await prismaClient.account.findFirst({
-        where :{
-          id: id,
-        },
-        select:{
-          id: true,
-          name: true,
-          type: true
-        }
-      })
-      return category;
-    }
 
-    if(type){
-      const category = await prismaClient.account.findMany({
-        where :{
-          type: type,
-        },
-        select:{
-          id: true,
-          name: true,
-          type: true
-        }
-      })
-      return category;
-    }
+    let query = {
+      where:{
 
-    if(name){
-      const category = await prismaClient.account.findMany({
-        where :{
-          name: name,
-        },
-        select:{
-          id: true,
-          name: true,
-          type: true
-        }
-      })
-      return category;
-    }
-
-    const category = await prismaClient.account.findMany({
+      },
       select:{
         id: true,
         name: true,
         type: true
       }
-    })
+    }
+    if(id) query.where = {...query.where, id:id};
+    if(type) query.where = {...query.where, type:type};
+    if(name) query.where = {...query.where, name:name};
+    query.where={...query.where, active: true};
 
-    return category;
+    const account = await prismaClient.account.findMany(query);
+    return account;
 
   }
 }

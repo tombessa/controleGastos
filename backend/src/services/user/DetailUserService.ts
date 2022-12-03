@@ -5,7 +5,8 @@ class DetailUserService{
 
     const user = await prismaClient.user.findFirst({
       where:{
-        id: user_id
+        id: user_id,
+        active: true,
       },
       select:{
         id: true,

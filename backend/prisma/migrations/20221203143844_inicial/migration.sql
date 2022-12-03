@@ -1,34 +1,14 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
 
-  - You are about to drop the `items` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `orders` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `products` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "items" DROP CONSTRAINT "items_order_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "items" DROP CONSTRAINT "items_product_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "products" DROP CONSTRAINT "products_category_id_fkey";
-
--- AlterTable
-ALTER TABLE "categories" ADD COLUMN     "created_by" TEXT,
-ADD COLUMN     "expense" BOOLEAN NOT NULL DEFAULT true,
-ADD COLUMN     "includeGoal" BOOLEAN NOT NULL DEFAULT true,
-ADD COLUMN     "updated_by" TEXT;
-
--- DropTable
-DROP TABLE "items";
-
--- DropTable
-DROP TABLE "orders";
-
--- DropTable
-DROP TABLE "products";
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "banks" (
@@ -37,10 +17,25 @@ CREATE TABLE "banks" (
     "type" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "created_by_id" TEXT,
-    "updated_by_id" TEXT,
+    "created_by" TEXT,
+    "updated_by" TEXT,
 
     CONSTRAINT "banks_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "categories" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "expense" BOOLEAN NOT NULL DEFAULT true,
+    "includeGoal" BOOLEAN NOT NULL DEFAULT true,
+    "priority" INTEGER NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "created_by" TEXT,
+    "updated_by" TEXT,
+
+    CONSTRAINT "categories_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable

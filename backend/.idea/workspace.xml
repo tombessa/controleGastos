@@ -6,7 +6,24 @@
   <component name="ChangeListManager">
     <list default="true" id="713ee687-5c4d-4b2d-bc21-5d199ca1df0d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.dev" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20220210185304_create_table_users/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20220210191650_create_models_pizzaria/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20221130185415_account/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20221130192616_gastos/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20221130201732_bank/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/account/ListAccountController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/account/ListAccountController.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/category/ListCategoryController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/category/ListCategoryController.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/account/ListAccountService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/account/ListAccountService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/category/ListCategoryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/category/ListCategoryService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/user/AuthUserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/user/AuthUserService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/user/DetailUserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/user/DetailUserService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,20 +44,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="dart.analysis.tool.window.visible" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-    <property name="ts.external.directory.path" value="C:\Portfolio\cafeteria\backend\node_modules\typescript\lib" />
-    <property name="vue.rearranger.settings.migration" value="true" />
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "dart.analysis.tool.window.visible": "false",
+    "last_opened_file_path": "C:/Portfolio/controleGastos/backend/src/controllers",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "ts.external.directory.path": "C:\\Portfolio\\controleGastos\\backend\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Portfolio\controleGastos\backend\src\controllers" />
+      <recent name="C:\Portfolio\controleGastos\backend\src\services" />
+      <recent name="C:\Portfolio\controleGastos\backend\src\controllers\expense" />
+      <recent name="C:\Portfolio\controleGastos\backend\src\services\expense" />
+      <recent name="C:\Portfolio\controleGastos\backend\src\controllers\goalPeriod" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Portfolio\controleGastos\backend\src\controllers\user" />
+      <recent name="C:\Portfolio\controleGastos\backend\src\services\user" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -57,11 +88,30 @@
       <workItem from="1669553413772" duration="51000" />
       <workItem from="1670076485012" duration="199000" />
       <workItem from="1670076727515" duration="91000" />
-      <workItem from="1670076889172" duration="325000" />
+      <workItem from="1670076889172" duration="447000" />
+      <workItem from="1670077406177" duration="27000" />
+      <workItem from="1670077513952" duration="143000" />
+      <workItem from="1670077677825" duration="518000" />
+      <workItem from="1670078221766" duration="9497000" />
+      <workItem from="1670090589692" duration="4020000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.prisma" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
