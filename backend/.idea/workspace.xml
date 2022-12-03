@@ -4,27 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="713ee687-5c4d-4b2d-bc21-5d199ca1df0d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env.dev" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/20220210185304_create_table_users/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/20220210191650_create_models_pizzaria/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/20221130185415_account/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/20221130192616_gastos/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/20221130201732_bank/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/account/ListAccountController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/account/ListAccountController.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/category/ListCategoryController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/category/ListCategoryController.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/account/ListAccountService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/account/ListAccountService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/category/ListCategoryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/category/ListCategoryService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/user/AuthUserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/user/AuthUserService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/user/DetailUserService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/user/DetailUserService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
-    </list>
+    <list default="true" id="713ee687-5c4d-4b2d-bc21-5d199ca1df0d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,7 +73,7 @@
       <workItem from="1670077513952" duration="143000" />
       <workItem from="1670077677825" duration="518000" />
       <workItem from="1670078221766" duration="9497000" />
-      <workItem from="1670090589692" duration="4020000" />
+      <workItem from="1670090589692" duration="4136000" />
     </task>
     <servers />
   </component>
