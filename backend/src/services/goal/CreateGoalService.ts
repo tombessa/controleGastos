@@ -15,27 +15,44 @@ class CreateGoalService{
 
     //Verify first if exists
     const listGoalService = new ListGoalService();
-    const goalExists = await listGoalService.execute({ id: null, amount: null, category_id: category_id, amount_compare:"="});
+    const goalExists = await listGoalService.execute({ id: null, amount: null, category_id: category_id, amount_compare:null});
 
-    if(goalExists) if(goalExists[0]) return goalExists[0];
-
-    let create = {
-      data:{
-        amount: amount,
-        category_id: category_id,
-        created_by: created_by,
-        updated_by: updated_by
-      },
-      select:{
-        id: true,
-        amount: true,
-        category_id: true
+    let goal;
+    if(goalExists) if(goalExists[0]) {
+      let update = {
+        where:{
+          id: goalExists[0].id
+        },
+        data:{
+          amount: amount,
+          category_id: category_id,
+          updated_at: new Date(),
+          updated_by: updated_by,
+        },
+        select:{
+          id: true,
+          amount: true,
+          category_id: true
+        }
+      };
+      goal = await prismaClient.goal.update(update);
+    }else{
+      let create = {
+        data:{
+          amount: amount,
+          category_id: category_id,
+          created_by: created_by,
+          updated_by: updated_by
+        },
+        select:{
+          id: true,
+          amount: true,
+          category_id: true
+        }
       }
+  
+      goal = await prismaClient.goal.create(create);
     }
-
-    const goal = await prismaClient.goal.create(create)
-
-
     return goal;
 
   }

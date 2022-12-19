@@ -7,19 +7,19 @@ interface EarnRequest{
   description: string;
   value: number;
   category_id: string;
-  period_id: string;
+  goal_period_id: string;
   updated_by: string;
 }
 
 class UpdateEarnService{
-  async execute({ id, date, description, value, category_id, period_id,  updated_by}: EarnRequest){
+  async execute({ id, date, description, value, category_id, goal_period_id,  updated_by}: EarnRequest){
 
     if(!id)throw new Error('Id invalid')
     if(!date)throw new Error('Date invalid')
     if(!description)throw new Error('Description invalid')
     if(!value)throw new Error('Value invalid')
     if(!category_id)throw new Error('Category invalid')
-    if(!period_id)throw new Error('Period invalid')
+    if(!goal_period_id)throw new Error('Goal Period invalid')
 
     const earn = await prismaClient.earn.update({
       where:{
@@ -30,12 +30,12 @@ class UpdateEarnService{
         description: description,
         value: value,
         category_id: category_id,
-        period_id: period_id,
+        goal_period_id: goal_period_id,
         updated_at: new Date(),
         updated_by: updated_by,
       },
       include:{
-        period: true,
+        goalPeriod: true,
         category: true
       }
     })

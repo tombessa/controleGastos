@@ -1,9 +1,9 @@
 import prismaClient from "../../prisma";
 
 interface PeriodRequest{
-  id: string,
-  month: number;
-  year: number;
+  id?: string,
+  month?: number;
+  year?: number;
 }
 
 

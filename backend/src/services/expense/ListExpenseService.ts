@@ -6,7 +6,7 @@ interface ExpenseRequest{
   description?: string;
   value?: number;
   category_id?: string;
-  period_id?: string;
+  goal_period_id?: string;
   date_compare?: string;
   date_ini?: string;
   date_fim?: string;
@@ -14,14 +14,14 @@ interface ExpenseRequest{
 
 
 class ListExpenseService{
-  async execute({ id, date, description, value, category_id, period_id, date_compare,date_ini, date_fim}: ExpenseRequest){
+  async execute({ id, date, description, value, category_id, goal_period_id, date_compare,date_ini, date_fim}: ExpenseRequest){
 
     let query = {
       where:{
       },
       include:{
         category: true,
-        period: true
+        goalPeriod: true
       }
     };
 
@@ -29,7 +29,7 @@ class ListExpenseService{
     if(description) query.where = {...query.where, description:description};
     if(value) query.where = {...query.where, value:value};
     if(category_id) query.where = {...query.where, category_id:category_id};
-    if(period_id) query.where = {...query.where, period_id:period_id};
+    if(goal_period_id) query.where = {...query.where, goal_period_id:goal_period_id};
 
     //Compare one Date
     if(date_compare){

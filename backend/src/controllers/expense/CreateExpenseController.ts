@@ -3,7 +3,7 @@ import { CreateExpenseService } from '../../services/expense/CreateExpenseServic
 
 class CreateExpenseController{
   async handle(req: Request, res: Response){
-    const { date, description, value, category_id, period_id} = req.body;
+    const { date, description, value, category_id, goal_period_id} = req.body;
     
     const user_id = req.user_id as string;
     const created_by = user_id;
@@ -11,7 +11,7 @@ class CreateExpenseController{
 
     const createExpenseService = new CreateExpenseService();
 
-    const Expense = await createExpenseService.execute({ date, description, value, category_id, period_id, created_by, updated_by});
+    const Expense = await createExpenseService.execute({ date, description, value, category_id, goal_period_id, created_by, updated_by});
 
     return res.json(Expense);
 

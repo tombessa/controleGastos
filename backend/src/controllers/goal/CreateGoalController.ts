@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'
-import { CreateGoalService } from '../../services/goal/CreateGoalService'
+import { CreateGoalService } from '../../services/goal/CreateGoalService';
 
 class CreateGoalController{
   async handle(req: Request, res: Response){
@@ -9,10 +9,8 @@ class CreateGoalController{
     const created_by = user_id;
     const updated_by = user_id;
 
-    const createGoalService = new CreateGoalService();
-
+    const createGoalService = new CreateGoalService();    
     const goal = await createGoalService.execute({ amount, created_by, updated_by, category_id});
-
     return res.json(goal);
 
   }

@@ -64,9 +64,7 @@ model Period{
   created_by String?
   updated_by String?
 
-  @@map("periods") 
-  expenses Expense[]
-  earnings Earn[]
+  @@map("periods")   
   GoalPeriods GoalPeriod[]
 }
 
@@ -98,6 +96,8 @@ model GoalPeriod{
   @@map("goalPeriods")
   period_id String
   category_id String
+  earns Earn[]
+  expenses Expense[]
 }
 
 model Expense{
@@ -111,11 +111,11 @@ model Expense{
   updated_by String?
 
   category Category @relation(fields: [category_id], references: [id])
-  period Period @relation(fields: [period_id], references: [id])
+  goalPeriod GoalPeriod @relation(fields: [goal_period_id], references: [id])
 
   @@map("expenses")
   category_id String
-  period_id String
+  goal_period_id String
 }
 
 model Earn{
@@ -129,9 +129,9 @@ model Earn{
   updated_by String?
 
   category Category @relation(fields: [category_id], references: [id])
-  period Period @relation(fields: [period_id], references: [id])
+  goalPeriod GoalPeriod @relation(fields: [goal_period_id], references: [id])
 
   @@map("earn")
   category_id String
-  period_id String
+  goal_period_id String
 }

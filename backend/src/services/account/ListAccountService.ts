@@ -22,8 +22,7 @@ class ListAccountService{
     if(id) query.where = {...query.where, id:id};
     if(type) query.where = {...query.where, type:type};
     if(name) query.where = {...query.where, name:name};
-    query.where={...query.where, active: true};
-
+    
     const account = await prismaClient.account.findMany(query);
     return account;
 
