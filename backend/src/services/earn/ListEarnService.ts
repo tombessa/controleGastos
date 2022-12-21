@@ -1,4 +1,5 @@
 import prismaClient from "../../prisma";
+import { AccountRequest } from "../account/ListAccountService";
 
 interface EarnRequest{
   id?: string,
@@ -10,21 +11,41 @@ interface EarnRequest{
   date_compare?: string;
   date_ini?: string;
   date_fim?: string;
+  created_by: string;
+  account: AccountRequest;
 }
 
 
 class ListEarnService{
-  async execute({ id, date, description, value, category_id, goal_period_id, date_compare,date_ini, date_fim}: EarnRequest){
+  async execute({ id, date, description, value, category_id, goal_period_id, date_compare,date_ini, date_fim, created_by, account}: EarnRequest){
 
     let query = {
       where:{
       },
       include:{
         category: true,
-        goalPeriod: true
+        goalPeriod: true,
+        account: true
       }
     };
-
+    if(account){
+      if(account.id) query.where = {...query.where, 
+        account:{...account,
+          id:account.id
+        }
+      };
+      if(account.type) query.where = {...query.where, 
+        account:{...account,
+          type:account.type
+        }
+      };
+      if(account.name) query.where = {...query.where, 
+        account:{...account,
+          name:account.name
+        }
+      };
+    }
+    query.where = {...query.where, created_by: created_by};
     if(id) query.where = {...query.where, id:id};
     if(description) query.where = {...query.where, description:description};
     if(value) query.where = {...query.where, value:value};

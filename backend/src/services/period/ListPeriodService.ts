@@ -4,11 +4,13 @@ interface PeriodRequest{
   id?: string,
   month?: number;
   year?: number;
+  created_by: string;
 }
 
+export {PeriodRequest};
 
 class ListPeriodService{
-  async execute({ id, month, year}: PeriodRequest){
+  async execute({ id, month, year, created_by}: PeriodRequest){
 
     let query = {
       where:{
@@ -19,6 +21,8 @@ class ListPeriodService{
         year: true
       }
     };
+    
+    query.where = {...query.where, created_by:created_by};
     if(id) query.where = {...query.where, id:id};
     if(month) query.where = {...query.where, month:month};
     if(year) query.where = {...query.where, year:year};

@@ -5,11 +5,12 @@ interface GoalRequest{
   amount?: number;
   category_id?: string;
   amount_compare?: string;
+  created_by: string;
 }
 
 
 class ListGoalService{
-  async execute({ id, amount, category_id, amount_compare}: GoalRequest){
+  async execute({ id, amount, category_id, amount_compare, created_by}: GoalRequest){
 
     let query = {
       where:{
@@ -18,7 +19,7 @@ class ListGoalService{
         category: true
       }
     };
-
+    query.where = {...query.where, created_by: created_by};
     if(id) query.where = {...query.where, id:id};
     if((amount)&&(amount_compare==='=')) query.where = {...query.where, amount:amount};
     if((amount)&&(amount_compare==='>='))

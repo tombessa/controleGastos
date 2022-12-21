@@ -45,11 +45,13 @@ router.delete('/users', isAuthenticated,  new DeleteUserController().handle )
 router.post('/category', isAuthenticated, new CreateCategoryController().handle )
 router.patch('/category', isAuthenticated, new UpdateCategoryController().handle )
 router.get('/category', isAuthenticated, new ListCategoryController().handle )
+router.get('/category/resume', isAuthenticated, new ListCategoryController().resume )
 
 //-- ROTAS ACCOUNT
 router.post('/account', isAuthenticated, new CreateAccountController().handle )
 router.patch('/account', isAuthenticated, new UpdateAccountController().handle )
 router.get('/account', isAuthenticated, new ListAccountController().handle )
+
 
 
 //-- ROTAS PERIOD

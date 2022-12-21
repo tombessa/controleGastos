@@ -15,7 +15,7 @@ class CreateGoalService{
 
     //Verify first if exists
     const listGoalService = new ListGoalService();
-    const goalExists = await listGoalService.execute({ id: null, amount: null, category_id: category_id, amount_compare:null});
+    const goalExists = await listGoalService.execute({ id: null, amount: null, category_id: category_id, amount_compare:null, created_by: created_by});
 
     let goal;
     if(goalExists) if(goalExists[0]) {

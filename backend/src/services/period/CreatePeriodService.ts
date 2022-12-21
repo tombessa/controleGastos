@@ -1,4 +1,6 @@
 import prismaClient from "../../prisma";
+import { ListGoalService } from "../goal/ListGoalService";
+import { CreateGoalPeriodService } from "../goalPeriod/CreateGoalPeriodService";
 import { ListPeriodService } from "./ListPeriodService";
 
 interface PeriodRequest{
@@ -16,9 +18,19 @@ class CreatePeriodService{
 
     //Verify if exists
     const listPeriod = new ListPeriodService();
-    const periodExists = listPeriod.execute({month, year});
+    const periodExists = listPeriod.execute({month, year, created_by});
     let period;
     if(periodExists) if(periodExists[0]) {
+      //Quando se cria um período, automaticamente, cria-se seus objetivos
+      const listGoal = new ListGoalService();
+      const goals = await listGoal.execute({created_by});
+      goals.forEach(goal => {
+        const createGoalPeriod = new CreateGoalPeriodService();
+        const category_id = goal.category_id;
+        const period_id = periodExists[0].id;
+        const amount = goal.amount;
+        const goalPeriod = createGoalPeriod.execute({amount, category_id, period_id, created_by, updated_by});
+      });
       return periodExists[0];
     }else{
       period = await prismaClient.period.create({
@@ -34,7 +46,17 @@ class CreatePeriodService{
           year: true
         }
       });
-    }
+      //Quando se cria um período, automaticamente, cria-se seus objetivos
+      const listGoal = new ListGoalService();
+      const goals = await listGoal.execute({created_by});
+      goals.forEach(goal => {
+        const createGoalPeriod = new CreateGoalPeriodService();
+        const category_id = goal.category_id;
+        const period_id = period.id;
+        const amount = goal.amount;
+        const goalPeriod = createGoalPeriod.execute({amount, category_id, period_id, created_by, updated_by});
+      });
+    }    
 
     return period;
 

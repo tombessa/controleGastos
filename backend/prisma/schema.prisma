@@ -33,7 +33,9 @@ model Account{
   created_by String?
   updated_by String?
 
-  @@map("banks")  
+  @@map("banks")
+  earns Earn[]
+  expenses Expense[]
 }
 
 
@@ -112,10 +114,12 @@ model Expense{
 
   category Category @relation(fields: [category_id], references: [id])
   goalPeriod GoalPeriod @relation(fields: [goal_period_id], references: [id])
+  account Account @relation(fields: [bank_id], references: [id])
 
   @@map("expenses")
   category_id String
   goal_period_id String
+  bank_id String
 }
 
 model Earn{
@@ -130,8 +134,10 @@ model Earn{
 
   category Category @relation(fields: [category_id], references: [id])
   goalPeriod GoalPeriod @relation(fields: [goal_period_id], references: [id])
+  account Account @relation(fields: [bank_id], references: [id])
 
   @@map("earn")
   category_id String
   goal_period_id String
+  bank_id String
 }
