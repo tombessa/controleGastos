@@ -1,4 +1,5 @@
 import prismaClient from "../../prisma";
+import { ListEarnService } from "../earn/ListEarnService";
 import { ListExpenseService } from "../expense/ListExpenseService";
 import { ListGoalPeriodService } from "../goalPeriod/ListGoalPeriodService";
 import { PeriodRequest } from "../period/ListPeriodService";
@@ -54,11 +55,12 @@ class ListCategoryService{
     }else throw new Error('Period invalid');
 
     /*Summarize*/
-    
-    const periodSum = await new ListExpenseService().resume({period});
-    
+    let periodSum = [];
+    const periodSumExpense = await new ListExpenseService().resume({period});
+    const periodSumEarn = await new ListEarnService().resume({period});
+    periodSumExpense.forEach(item => periodSum.push(item));
+    periodSumEarn.forEach(item => periodSum.push(item));
     const categorySearch = await prismaClient.category.findMany(query);
-    
     let categoryReturn = [];
     categorySearch.forEach(item=>{
       item.goalPeriods = item.goalPeriods.filter(t => t.period_id === period_id_filtered);

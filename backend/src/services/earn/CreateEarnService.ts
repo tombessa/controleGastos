@@ -55,8 +55,8 @@ class CreateEarnService{
     if(category_id === undefined) throw new Error('Category invalid')
     if(bank_id===undefined) throw new Error ('Account invalid')
 
-    const listCategoryService = new ListCategoryService();
-    const category = await listCategoryService.execute({id:category_id, expense:false, created_by: created_by});
+    const category = await new ListCategoryService().execute({id:category_id, expense:false, created_by: created_by});
+    
     if(category.length===0)throw new Error('Category is not an Earn')
 
     const earn = await prismaClient.earn.create({

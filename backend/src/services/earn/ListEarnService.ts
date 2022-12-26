@@ -1,5 +1,8 @@
 import prismaClient from "../../prisma";
 import { AccountRequest } from "../account/ListAccountService";
+import {  PeriodRequest } from "../period/ListPeriodService";
+
+import { ListGoalPeriodService } from "../goalPeriod/ListGoalPeriodService";
 
 interface EarnRequest{
   id?: string,
@@ -15,8 +18,33 @@ interface EarnRequest{
   account: AccountRequest;
 }
 
+interface EarnResumeRequest{
+  period: PeriodRequest;
+}
 
 class ListEarnService{
+  async resume({period}: EarnResumeRequest){
+    let goalPeriodList = [];
+
+    if(period){
+      const goalPeriodService = new ListGoalPeriodService();
+      const goalPeriods = await goalPeriodService.execute({period});
+
+      if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
+    }
+    
+    const expense = await prismaClient.earn.groupBy({
+      by: ['category_id'],
+      _sum:{
+        value: true,
+      },
+      where:{
+        goal_period_id: {in: goalPeriodList}
+      }
+    });
+    return expense;
+  }
+
   async execute({ id, date, description, value, category_id, goal_period_id, date_compare,date_ini, date_fim, created_by, account}: EarnRequest){
 
     let query = {
