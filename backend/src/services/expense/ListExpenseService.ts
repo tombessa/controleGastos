@@ -24,19 +24,22 @@ interface ExpenseResumeRequest{
 class ListExpenseService{
 
   async resume({period}: ExpenseResumeRequest){
-    let goal_period_id = undefined;
+    let goalPeriodList = [];
+
     if(period){
       const goalPeriodService = new ListGoalPeriodService();
       const goalPeriods = await goalPeriodService.execute({period});
-      if(goalPeriods.length>0) goal_period_id = goalPeriods[0].id;
+
+      if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
     }
+    
     const expense = await prismaClient.expense.groupBy({
       by: ['category_id'],
       _sum:{
         value: true,
       },
       where:{
-        goal_period_id: goal_period_id
+        goal_period_id: {in: goalPeriodList}
       }
     });
     return expense;

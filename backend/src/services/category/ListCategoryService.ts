@@ -44,22 +44,29 @@ class ListCategoryService{
     if(priority) query.where = {...query.where, expense:priority};
     if(!period) throw new Error('Period invalid');
     /*Filter Period*/
-    let goalPeriodList;
+    let period_id_filtered;
     if((period.month)&&(period.year)){
-      goalPeriodList = await new ListGoalPeriodService().execute({period});
+      let category, goalPeriodList;
+      if(name) category = {...category, name, created_by};
+      goalPeriodList = await new ListGoalPeriodService().execute({period, category});
       if(goalPeriodList.length===0) throw new Error('Period invalid');
+      period_id_filtered = goalPeriodList[0].period_id;
     }else throw new Error('Period invalid');
 
     /*Summarize*/
+    
     const periodSum = await new ListExpenseService().resume({period});
-    const category = await prismaClient.category.findMany(query);
+    
+    const categorySearch = await prismaClient.category.findMany(query);
+    
     let categoryReturn = [];
-    category.forEach(item=>{
-      item.goalPeriods = item.goalPeriods.filter(t => t.id === goalPeriodList[0].id);
+    categorySearch.forEach(item=>{
+      item.goalPeriods = item.goalPeriods.filter(t => t.period_id === period_id_filtered);
       let periodSumList = periodSum.filter(sum => sum.category_id===item.id);
-      let periodSumItem={};
-      if(periodSumList) if(periodSumList.length>0) periodSumItem = {amount: periodSumList[0]._sum.value};
+      let periodSumItem={amount:0, total: 0};
+      if(periodSumList) if(periodSumList.length>0) periodSumItem = {...periodSumItem, amount: periodSumList[0]._sum.value};
       if(item.goalPeriods) if(item.goalPeriods.length>0) periodSumItem = {...periodSumItem, total: item.goalPeriods[0].amount};
+      
       categoryReturn.push({...item, periodSumItem});
     });
     return categoryReturn;
