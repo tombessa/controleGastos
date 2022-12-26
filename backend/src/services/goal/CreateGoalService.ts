@@ -1,5 +1,6 @@
 import prismaClient from "../../prisma";
 import {ListGoalService} from "./ListGoalService";
+import { UpdateGoalService } from "./UpdateGoalService";
 
 interface GoalRequest{
   amount: number,
@@ -19,23 +20,8 @@ class CreateGoalService{
 
     let goal;
     if(goalExists) if(goalExists[0]) {
-      let update = {
-        where:{
-          id: goalExists[0].id
-        },
-        data:{
-          amount: amount,
-          category_id: category_id,
-          updated_at: new Date(),
-          updated_by: updated_by,
-        },
-        select:{
-          id: true,
-          amount: true,
-          category_id: true
-        }
-      };
-      goal = await prismaClient.goal.update(update);
+      const id = goalExists[0].id;
+      goal = await new UpdateGoalService().execute({id, amount, category_id, updated_by});      
     }else{
       let create = {
         data:{
