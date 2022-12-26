@@ -12,7 +12,7 @@ class UpdateGoalService{
   async execute({ id, amount, category_id,  updated_by}: GoalRequest){
 
     if(!id)throw new Error('Id invalid')
-    if(!amount)throw new Error('Amount invalid')
+    if(amount===undefined)throw new Error('Amount invalid')
     if(!category_id)throw new Error('Category invalid')
 
     const goal = await prismaClient.goal.update({

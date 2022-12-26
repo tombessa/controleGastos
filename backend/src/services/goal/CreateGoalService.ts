@@ -12,7 +12,7 @@ interface GoalRequest{
 class CreateGoalService{
   async execute({ amount, created_by, updated_by, category_id}: GoalRequest){
     
-    if(!amount)throw new Error('amount invalid')
+    if(amount===undefined)throw new Error('amount invalid')
 
     //Verify first if exists
     const listGoalService = new ListGoalService();

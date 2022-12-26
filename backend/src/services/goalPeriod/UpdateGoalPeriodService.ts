@@ -13,7 +13,7 @@ class UpdateGoalPeriodService{
   async execute({ id, amount, category_id, period_id,  updated_by}: GoalPeriodRequest){
 
     if(!id)throw new Error('Id invalid')
-    if(!amount)throw new Error('Amount invalid')
+    if(amount===undefined)throw new Error('Amount invalid')
     if(!period_id)throw new Error('Period invalid')
     if(!category_id)throw new Error('Period invalid')
 

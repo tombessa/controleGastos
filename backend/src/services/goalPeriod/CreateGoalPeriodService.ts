@@ -12,7 +12,7 @@ interface GoalPeriodRequest{
 class CreateGoalPeriodService{
   async execute({ amount, created_by, updated_by, category_id, period_id}: GoalPeriodRequest){
     
-    if(!amount)throw new Error('amount invalid')
+    if(amount===undefined)throw new Error('amount invalid')
 
     //Verify first if exists the Goal Period
     const listGoalPeriodService = new ListGoalPeriodService();
