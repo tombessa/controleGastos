@@ -50,7 +50,7 @@ class UpdateEarnService{
     }
 
     if(description===undefined)throw new Error('Description invalid')
-    if(!value)throw new Error('Value invalid')
+    if(value === undefined) throw new Error('Value invalid')
     if(category_id===undefined)throw new Error('Category invalid')
     if(goal_period_id===undefined)throw new Error('Goal Period invalid')
     if(bank_id===undefined)throw new Error('Account invalid')
