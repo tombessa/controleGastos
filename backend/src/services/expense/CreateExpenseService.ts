@@ -17,17 +17,19 @@ interface ExpenseRequest{
 
 class CreateExpenseService{
   async execute({ date, description, value, category_id, goal_period_id, bank_id, account, created_by, updated_by}: ExpenseRequest){
-
+    
     if(date === '') throw new Error('Date invalid')
     if((goal_period_id === undefined) && (category_id)){
       //Try to get goalPeriodId by Date
       try{
         const year = Number(date.substring(0,4));
         const month = Number(date.substring(5,7));
+        
         if((year)&&(month)){
           const period = {year: year, month: month, created_by: created_by};
           const goalPeriodService = new ListGoalPeriodService();
           const goalPeriod = await goalPeriodService.execute({category_id, period});
+          
           if(goalPeriod){
             if(goalPeriod.length>0) goal_period_id = goalPeriod[0].id;
           }
@@ -49,7 +51,7 @@ class CreateExpenseService{
 
     if(goal_period_id === undefined) throw new Error('Goal Period invalid')
     if(description === undefined) throw new Error('Description invalid')
-    if(!value) throw new Error('Value invalid')
+    if(value === undefined) throw new Error('Value invalid')
     if(category_id === undefined) throw new Error('Category invalid')
     if(bank_id===undefined) throw new Error('Account invalid')
     

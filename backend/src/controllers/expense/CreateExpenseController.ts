@@ -10,6 +10,7 @@ class CreateExpenseController{
     const updated_by = user_id;
 
     const createExpenseService = new CreateExpenseService();
+    
 
     const Expense = await createExpenseService.execute({ date, description, value, category_id, goal_period_id, account, bank_id, created_by, updated_by});
 
