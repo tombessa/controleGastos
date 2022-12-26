@@ -45,7 +45,7 @@ router.delete('/users', isAuthenticated,  new DeleteUserController().handle )
 router.post('/category', isAuthenticated, new CreateCategoryController().handle )
 router.patch('/category', isAuthenticated, new UpdateCategoryController().handle )
 router.get('/category', isAuthenticated, new ListCategoryController().handle )
-router.get('/category/resume', isAuthenticated, new ListCategoryController().resume )
+router.post('/category/resume', isAuthenticated, new ListCategoryController().resume )
 
 //-- ROTAS ACCOUNT
 router.post('/account', isAuthenticated, new CreateAccountController().handle )
