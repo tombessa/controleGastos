@@ -17,22 +17,9 @@ class CreatePeriodService{
     if(!year)throw new Error('Year invalid')
 
     //Verify if exists
-    const listPeriod = new ListPeriodService();
-    const periodExists = listPeriod.execute({month, year, created_by});
+    const periodExists = await new ListPeriodService().execute({month, year, created_by});
     let period;
-    if(periodExists) if(periodExists[0]) {
-      //Quando se cria um período, automaticamente, cria-se seus objetivos
-      const listGoal = new ListGoalService();
-      const goals = await listGoal.execute({created_by});
-      goals.forEach(goal => {
-        const createGoalPeriod = new CreateGoalPeriodService();
-        const category_id = goal.category_id;
-        const period_id = periodExists[0].id;
-        const amount = goal.amount;
-        const goalPeriod = createGoalPeriod.execute({amount, category_id, period_id, created_by, updated_by});
-      });
-      return periodExists[0];
-    }else{
+    if(periodExists.length===0){
       period = await prismaClient.period.create({
         data:{
           month: month,
@@ -54,9 +41,10 @@ class CreatePeriodService{
         const category_id = goal.category_id;
         const period_id = period.id;
         const amount = goal.amount;
-        const goalPeriod = createGoalPeriod.execute({amount, category_id, period_id, created_by, updated_by});
+        createGoalPeriod.execute({amount, category_id, period_id, created_by, updated_by});
       });
-    }    
+    }else period = periodExists[0];
+    
 
     return period;
 
