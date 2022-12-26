@@ -19,7 +19,7 @@ class CreateCategoryService{
     }
 
     //Verify if exists
-    let listCategory = await new ListCategoryService().execute({name, created_by});
+    let listCategory = await new ListCategoryService().execute({name, expense, created_by});
     let category={};
     if(listCategory.length>0){
       //Update it
