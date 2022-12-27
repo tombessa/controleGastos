@@ -26,6 +26,14 @@ class ListAccountService{
     var day = (dd>9 ? '' : '0') + dd;
     return day+"/"+month+"/"+dateParam.getFullYear();
   }
+
+  lastPeriod(period: PeriodRequest){
+    if(period.month==1){
+      return {month: 12, year: period.year-1};
+    }else{
+      return {month: period.month-1, year: period.year};
+    }
+  }
   
   async resume({expense, earn, period, created_by}: AccountResumeRequest){
     if(!expense.account) new Error("Account invalid")
@@ -47,17 +55,24 @@ class ListAccountService{
     let account = earn.account;
     const earns = await new ListEarnService().list({period, account, created_by});
     const totalEarns = await new ListEarnService().resumByPeriod({period, account, created_by});
+    const paramEarnLast = {period: this.lastPeriod(period), account: account, created_by: created_by} as EarnResumeAccountRequest;
+    const totalEarnsLastPeriod = await new ListEarnService().resumByPeriod(paramEarnLast);
+
+
     account = expense.account;
     const expenses = await new ListExpenseService().list({period, account, created_by});
     expenses.forEach(t=> t.value = -1*t.value);
     const totalExpenses = await new ListExpenseService().resumByPeriod({period, account, created_by});
+
+    const paramExpenseLast = {period: this.lastPeriod(period), account: account, created_by: created_by} as ExpenseResumeAccountRequest;
+    const totalExpensesLastPeriod = await new ListExpenseService().resumByPeriod(paramEarnLast);
 
     const extrato = [];
     earns.forEach(t => extrato.push({...t, dateFormat: this.formatDate(t.date)}));
     expenses.forEach(t => extrato.push({...t, dateFormat: this.formatDate(t.date)}));
     extrato.sort((a,b) => (a.date.getDate() > b.date.getDate()) ? 1 : ((b.date.getDate() > a.date.getDate()) ? -1 : 0));
     
-    return {accountReturn, totalEarns,totalExpenses, extrato};
+    return {accountReturn, totalEarnsLastPeriod, totalEarns, totalExpensesLastPeriod, totalExpenses, extrato};
   }
 
   async execute({id,type,name, created_by}:AccountRequest){

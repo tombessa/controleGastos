@@ -54,7 +54,7 @@ class ListCategoryService{
       period_id_filtered = goalPeriodList[0].period_id;
     }else throw new Error('Period invalid');
     
-    console.log(period_id_filtered);
+    
 
     /*Summarize*/
     let periodSum = [];
