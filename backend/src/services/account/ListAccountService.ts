@@ -19,7 +19,14 @@ interface AccountResumeRequest{
 }
 
 class ListAccountService{
-
+  formatDate(dateParam : Date){
+    var mm = dateParam.getMonth() + 1;
+    var month = (mm>9 ? '' : '0') + mm;
+    var dd = dateParam.getDate();
+    var day = (dd>9 ? '' : '0') + dd;
+    return day+"/"+month+"/"+dateParam.getFullYear();
+  }
+  
   async resume({expense, earn, period, created_by}: AccountResumeRequest){
     if(!expense.account) new Error("Account invalid")
     if(!earn.account) new Error("Account invalid")
@@ -46,9 +53,10 @@ class ListAccountService{
     const totalExpenses = await new ListExpenseService().resumByPeriod({period, account, created_by});
 
     const extrato = [];
-    earns.forEach(t => extrato.push({...t}));
-    expenses.forEach(t => extrato.push({...t}));
-    expenses.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0))
+    earns.forEach(t => extrato.push({...t, dateFormat: this.formatDate(t.date)}));
+    expenses.forEach(t => extrato.push({...t, dateFormat: this.formatDate(t.date)}));
+    extrato.sort((a,b) => (a.date.getDate() > b.date.getDate()) ? 1 : ((b.date.getDate() > a.date.getDate()) ? -1 : 0));
+    
     return {accountReturn, totalEarns,totalExpenses, extrato};
   }
 

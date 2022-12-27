@@ -88,7 +88,6 @@ class ListExpenseService{
 
       if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
     }
-    
     const expense = await prismaClient.expense.groupBy({
       by: ['category_id'],
       _sum:{
