@@ -42,8 +42,14 @@ class ListAccountService{
     const totalEarns = await new ListEarnService().resumByPeriod({period, account, created_by});
     account = expense.account;
     const expenses = await new ListExpenseService().list({period, account, created_by});
+    expenses.forEach(t=> t.value = -1*t.value);
     const totalExpenses = await new ListExpenseService().resumByPeriod({period, account, created_by});
-    return {accountReturn, totalEarns,totalExpenses, earns: earns, expenses: expenses};
+
+    const extrato = [];
+    earns.forEach(t => extrato.push({...t}));
+    expenses.forEach(t => extrato.push({...t}));
+    expenses.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0))
+    return {accountReturn, totalEarns,totalExpenses, extrato};
   }
 
   async execute({id,type,name, created_by}:AccountRequest){
