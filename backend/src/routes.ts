@@ -51,7 +51,7 @@ router.post('/category/resume', isAuthenticated, new ListCategoryController().re
 router.post('/account', isAuthenticated, new CreateAccountController().handle )
 router.patch('/account', isAuthenticated, new UpdateAccountController().handle )
 router.get('/account', isAuthenticated, new ListAccountController().handle )
-
+router.post('/account/resume', isAuthenticated, new ListAccountController().resume )
 
 
 //-- ROTAS PERIOD

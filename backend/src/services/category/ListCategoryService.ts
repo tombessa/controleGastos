@@ -49,15 +49,15 @@ class ListCategoryService{
     if((period.month)&&(period.year)){
       let category, goalPeriodList;
       if(name) category = {...category, name, created_by};
-      goalPeriodList = await new ListGoalPeriodService().execute({period, category});
+      goalPeriodList = await new ListGoalPeriodService().execute({period, category, created_by});
       if(goalPeriodList.length===0) throw new Error('Period invalid');
       period_id_filtered = goalPeriodList[0].period_id;
     }else throw new Error('Period invalid');
 
     /*Summarize*/
     let periodSum = [];
-    const periodSumExpense = await new ListExpenseService().resume({period});
-    const periodSumEarn = await new ListEarnService().resume({period});
+    const periodSumExpense = await new ListExpenseService().resume({period, created_by});
+    const periodSumEarn = await new ListEarnService().resume({period, created_by});
     periodSumExpense.forEach(item => periodSum.push(item));
     periodSumEarn.forEach(item => periodSum.push(item));
     const categorySearch = await prismaClient.category.findMany(query);

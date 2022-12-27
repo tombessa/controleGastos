@@ -10,11 +10,12 @@ interface GoalPeriodRequest{
   amount_compare?: string;
   period?: PeriodRequest;
   category?: CategoryRequest;
+  created_by: string;
 }
 
 
 class ListGoalPeriodService{
-  async execute({ id, amount, category_id, period_id, amount_compare, period, category}: GoalPeriodRequest){
+  async execute({ id, amount, category_id, period_id, amount_compare, period, category, created_by}: GoalPeriodRequest){
     
     let query = {
       where:{
@@ -24,7 +25,7 @@ class ListGoalPeriodService{
         period:true,
       }
     };
-
+    query.where = {...query.where, created_by: created_by};
     if(id) query.where = {...query.where, id:id};
     if((amount)&&(amount_compare==='=')) query.where = {...query.where, amount:amount};
     if((amount)&&(amount_compare==='>='))

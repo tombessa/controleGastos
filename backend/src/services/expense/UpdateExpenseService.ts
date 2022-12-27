@@ -29,7 +29,7 @@ class UpdateExpenseService{
         if((year)&&(month)){
           const period = {year: year, month: month, created_by: created_by};
           const goalPeriodService = new ListGoalPeriodService();
-          const goalPeriod = await goalPeriodService.execute({category_id, period});
+          const goalPeriod = await goalPeriodService.execute({category_id, period, created_by});
           if(goalPeriod){
             if(goalPeriod.length>0) goal_period_id = goalPeriod[0].id;
           }

@@ -18,17 +18,72 @@ interface ExpenseRequest{
 }
 interface ExpenseResumeRequest{
   period: PeriodRequest;
+  created_by: string;
 }
+
+interface ExpenseResumeAccountRequest{
+  period: PeriodRequest;
+  account: AccountRequest;
+  created_by: string;
+}
+
+export {ExpenseResumeAccountRequest};
 
 
 class ListExpenseService{
 
-  async resume({period}: ExpenseResumeRequest){
+  async list({period, account, created_by}: ExpenseResumeAccountRequest){
+    let goalPeriodList = [];
+    if((!account.name)&&(!account.type)) new Error("Account invalid")
+    if(period){
+      const goalPeriodService = new ListGoalPeriodService();
+      const goalPeriods = await goalPeriodService.execute({period, created_by});
+
+      if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
+    }
+
+    const expense = await prismaClient.expense.findMany({
+      where:{
+        goal_period_id: {in: goalPeriodList},
+        account: {name: account.name, type: account.type},
+        created_by: created_by
+      },
+      include:{
+        category: true
+      }
+    });
+    return expense;
+  }
+
+  async resumByPeriod({period, account, created_by}: ExpenseResumeAccountRequest){
+    let goalPeriodList = [];
+    if((!account.name)&&(!account.type)) new Error("Account invalid")
+    if(period){
+      const goalPeriodService = new ListGoalPeriodService();
+      const goalPeriods = await goalPeriodService.execute({period, created_by});
+
+      if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
+    }
+
+    const expense = await prismaClient.expense.aggregate( {
+      _sum:{
+        value: true,
+      },
+      where:{
+        goal_period_id: {in: goalPeriodList},
+        account: {name: account.name, type: account.type},
+        created_by: created_by
+      }
+    });
+    return expense;
+  }
+
+  async resume({period, created_by}: ExpenseResumeRequest){
     let goalPeriodList = [];
 
     if(period){
       const goalPeriodService = new ListGoalPeriodService();
-      const goalPeriods = await goalPeriodService.execute({period});
+      const goalPeriods = await goalPeriodService.execute({period, created_by});
 
       if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
     }
@@ -39,7 +94,8 @@ class ListExpenseService{
         value: true,
       },
       where:{
-        goal_period_id: {in: goalPeriodList}
+        goal_period_id: {in: goalPeriodList},
+        created_by: created_by
       }
     });
     return expense;

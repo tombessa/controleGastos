@@ -16,7 +16,7 @@ class CreateGoalPeriodService{
 
     //Verify first if exists the Goal Period
     const listGoalPeriodService = new ListGoalPeriodService();
-    const goalPeriodExists = await listGoalPeriodService.execute({ id: null, amount: null, category_id:category_id, period_id: period_id, amount_compare:null});
+    const goalPeriodExists = await listGoalPeriodService.execute({ id: null, amount: null, category_id:category_id, period_id: period_id, amount_compare:null, created_by: created_by});
 
     if(goalPeriodExists) if(goalPeriodExists[0]) return goalPeriodExists[0];
 
