@@ -38,11 +38,11 @@ class ListCategoryService{
       }
     };
     query.where = {...query.where, created_by:created_by};
-    if(id) query.where = {...query.where, id:id};
-    if(name) query.where = {...query.where, name:name};
+    if(id!==undefined) query.where = {...query.where, id:id};
+    if(name!==undefined) query.where = {...query.where, name:name};
     if(expense!==undefined) query.where = {...query.where, expense:expense};
-    if(includeGoal) query.where = {...query.where, expense:includeGoal};
-    if(priority) query.where = {...query.where, expense:priority};
+    if(includeGoal!==undefined) query.where = {...query.where, expense:includeGoal};
+    if(priority!==undefined) query.where = {...query.where, expense:priority};
     if(!period) throw new Error('Period invalid');
     /*Filter Period*/
     let period_id_filtered;
@@ -53,6 +53,8 @@ class ListCategoryService{
       if(goalPeriodList.length===0) throw new Error('Period invalid');
       period_id_filtered = goalPeriodList[0].period_id;
     }else throw new Error('Period invalid');
+    
+    console.log(period_id_filtered);
 
     /*Summarize*/
     let periodSum = [];
@@ -88,11 +90,11 @@ class ListCategoryService{
       }
     };
     query.where = {...query.where, created_by:created_by};
-    if(id) query.where = {...query.where, id:id};
-    if(name) query.where = {...query.where, name:name};
+    if(id!==undefined) query.where = {...query.where, id:id};
+    if(name!==undefined) query.where = {...query.where, name:name};
     if(expense!==undefined) query.where = {...query.where, expense:expense};
-    if(includeGoal) query.where = {...query.where, expense:includeGoal};
-    if(priority) query.where = {...query.where, expense:priority};
+    if(includeGoal!==undefined) query.where = {...query.where, expense:includeGoal};
+    if(priority!==undefined) query.where = {...query.where, expense:priority};
 
     const category = await prismaClient.category.findMany(query);
     return category;
