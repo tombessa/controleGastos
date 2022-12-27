@@ -48,6 +48,7 @@ class ListEarnService{
         account: {name: account.name, type: account.type},
         created_by: created_by
       },
+      orderBy:{ date: 'asc'},
       include:{
         category: true
       }
