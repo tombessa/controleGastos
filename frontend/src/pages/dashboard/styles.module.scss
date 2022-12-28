@@ -26,6 +26,16 @@
 
 }
 
+.choiceTop{
+  margin-top: 0rem;
+  width: 600px;  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  padding: 2rem 1.5rem;  
+}
+
 .listOrder{
     display: flex;
     flex-direction: column;
