@@ -48,7 +48,6 @@ export default function Dashboard({periods, accounts}: HomeProps){
       setAccountOption({value: account, values:  array, handleChange: handleChangeAccount});
     }
     if(periods){
-      let array = periods.map((item, index)=> {return{...item, value: item.month + "/" + item.year}});      
       setPeriodOption({value: period,  values: array , handleChange: handleChangePeriod});
     }      
   }, []);
