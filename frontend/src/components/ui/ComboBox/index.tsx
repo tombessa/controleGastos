@@ -1,8 +1,8 @@
 
-import { SelectHTMLAttributes, OptionHTMLAttributes } from 'react';
+import { SelectHTMLAttributes, OptionHTMLAttributes, useEffect } from 'react';
 import { SelectFormProps } from '../Form';
 import styles from './styles.module.scss';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 
 interface ComboBoxProps extends SelectHTMLAttributes<HTMLSelectElement>{}
 interface OptionProps extends OptionHTMLAttributes<HTMLOptionElement>{}
@@ -17,21 +17,25 @@ export function ComboBox({...rest}: ComboBoxProps){
   )
 }
 
-export function CompleteComboBox({...rest}: SelectFormProps){  
-  if(rest===undefined) return;
-  if(rest.values===undefined) return;
-
-  const montaCombobox = useMemo(() =>(
-    <ComboBox value={rest.value} onChange={rest.handleChange}>
-          {rest.values.map((item, index)=> {
-              return(
-              <OptionCombo key={item.id} value={item.id}>
-                  {item.value}
-              </OptionCombo>
-              ) 
-          })}
-    </ComboBox>
-  ),[rest]);
-  console.log(rest)
-  return <div>{montaCombobox}</div>;
+export function CompleteComboBox({value, setValue, values, handleChange}: SelectFormProps){  
+  if(handleChange===undefined) return;
+  if(values===undefined) return;
+  const[montaCombo, setMontaCombo] = useState<any>();
+  useEffect(() => {
+    console.log(value);
+    function carregaCombobox(value, values, handleChange) {
+      return (<ComboBox  value={value} onChange={handleChange}>
+        {values.map((item, index)=> {
+            return(
+            <OptionCombo key={item.id} value={item}>
+                {item.value}
+            </OptionCombo>
+            ) 
+        })}
+      </ComboBox>);
+    }
+    setMontaCombo(carregaCombobox(value, values, handleChange));
+  }, [value, setValue, values, handleChange]);
+  
+  return <div>{montaCombo}</div>;
 }

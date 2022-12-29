@@ -54,6 +54,7 @@ export type ItemFormProps = {
 
 export type SelectFormProps = {
     value: any
+    setValue: ChangeEventHandler<any>
     values: Array<any>
     handleChange: ChangeEventHandler<HTMLSelectElement>    
 }
