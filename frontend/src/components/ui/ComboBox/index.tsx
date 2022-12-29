@@ -17,25 +17,15 @@ export function ComboBox({...rest}: ComboBoxProps){
   )
 }
 
-export function CompleteComboBox({value, setValue, values, handleChange}: SelectFormProps){  
-  if(handleChange===undefined) return;
+export function CompleteComboBox({value, setValue, values}: SelectFormProps){
   if(values===undefined) return;
-  const[montaCombo, setMontaCombo] = useState<any>();
-  useEffect(() => {
-    console.log(value);
-    function carregaCombobox(value, values, handleChange) {
-      return (<ComboBox  value={value} onChange={handleChange}>
-        {values.map((item, index)=> {
-            return(
-            <OptionCombo key={item.id} value={item}>
-                {item.value}
-            </OptionCombo>
-            ) 
-        })}
-      </ComboBox>);
-    }
-    setMontaCombo(carregaCombobox(value, values, handleChange));
-  }, [value, setValue, values, handleChange]);
-  
-  return <div>{montaCombo}</div>;
+  return ((<ComboBox  value={value?value.id:undefined} onChange={((event)=>{setValue(values.filter(t=>t.id===event.target.value)[0])})}>
+    {values.map((item, index)=> {
+        return(
+        <OptionCombo key={item.id} value={item.id}>
+            {item.value}
+        </OptionCombo>
+        ) 
+    })}
+  </ComboBox>));
 }

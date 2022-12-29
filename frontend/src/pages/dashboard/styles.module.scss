@@ -26,6 +26,59 @@
 
 }
 
+.labelSaldoApresentacao{
+    width: 100%;
+    background-color: var(--dark-900);
+    color: var(--white);
+    margin-bottom: 0.2rem;
+    margin-left: 0.3rem;
+    border-radius: 0.3rem;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.labelSaldoGreen{
+    width: 100%;
+    background-color: var(--green-900);
+    color: var(--white);
+    margin-bottom: 0.2rem;
+    border-radius: 0.3rem;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.labelSaldoRed{
+    width: 100%;
+    background-color: var(--red-900);
+    color: var(--white);
+    margin-bottom: 0.2rem;
+    border-radius: 0.3rem;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.labelSaldo{
+    width: 100%;
+    background-color: var(--dark-900);
+    color: var(--white);
+    margin-bottom: 0.2rem;
+    border-radius: 0.3rem;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.choiceTopRefresh{
+    margin-top: 0rem;
+    width: 600px;  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+
 .choiceTop{
   margin-top: 0rem;
   width: 600px;  

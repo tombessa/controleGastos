@@ -9,9 +9,9 @@ import { toast } from "react-toastify";
 import { ListPeriodProps, ListAccountProps, AccountResumeProps } from "../../services/apiClient";
 import { ComboBox, CompleteComboBox, OptionCombo } from "../../components/ui/ComboBox";
 import { GenericForm } from '../../components/ui/Form';
-import MaterialTable from 'material-table';
-import { AddBox, ArrowDownward } from "@material-ui/icons";
-import { ThemeProvider, createTheme } from '@mui/material';
+import { GenericTable } from '../../components/ui/Table';
+import moment from 'moment';
+
 
 export type HomeProps = {
   periods: ListPeriodProps;
@@ -21,74 +21,158 @@ export type HomeProps = {
 
 
 export default function Dashboard({periods, accounts, accountResume}: HomeProps){
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectExtrato, setSelectExtrato] = useState(null);
   
   const [period, setPeriod] = useState();
-  const [account, setAccount] = useState();
-  
-  const[periodOption, setPeriodOption] = useState<any>();
-  const[accountOption, setAccountOption] = useState<any>();
+  const [account, setAccount] = useState();  
+  const[periodOption, setPeriodOption] = useState<PeriodProps>();
+  const[accountOption, setAccountOption] = useState<AccountProps>();
+  const [accountResumeList, setAccountResumeList] =useState<any>();
+  const [accountTotal, setAccountTotal] = useState();
 
-  function handleChangePeriod(event : any){    
-    setPeriod(event.target.value);
-  }
-  function handleChangeAccount(event : any){
-    setAccount(event.target.value);
-  }
-  const columns = [
-    { title: 'Data', field: 'date' },
+  const apiClient = setupAPIClient();
+  let columns= [
+    { title: 'Data', field: 'dateFormat' },
     { title: 'Categoria', field: 'category.name' },
     { title: 'Descrição', field: 'description' },
-    { title: 'Valor', field: 'value' }
+    { title: 'Valor', field: 'valorMoeda' }
   ];
+  const [rest, setRest] = useState();
+
+  function refresh(){
+    if(accounts){
+      let array = accounts.map((item)=> {return{...item, value: item.name + "/" + item.type}});      
+      setAccountOption({value: account, setValue: setAccount, values:  array});      
+    }
+    if(periods){      
+      let array = periods.map((item)=> {return{...item, value: item.month + "/" + item.year}});
+      setPeriodOption({value: period, setValue: setPeriod,  values: array});      
+    }
+    load();
+  }
+
+  async function load() {
+    let jsonResume = {
+      expense:{
+        account:{
+          name: account ? account.name: accounts[0].name,
+          type: account ? account.type: accounts[0].type
+        }
+      },
+      earn:{
+        account:{
+          name: account ? account.name: accounts[0].name,
+          type: account ? account.type: accounts[0].type
+        }
+      },
+      period:{
+        month: period ? period.month: periods[0].month,
+        year: period ? period.year: periods[0].year,
+      }        
+    };
+    let lista = (await apiClient.post('/account/resume', jsonResume)).data;
+    let dados = lista.extrato.map((item, index) => {
+      return {...item,
+          valorMoeda: item.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+        }
+    });
+    setAccountResumeList(dados);
+    setRest({columns: columns, data: dados, 
+      options:{
+        pageSize:10
+      }
+    });
+
+    let resumeTotal = {
+      totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
+      totalGanhoMesAtual: lista.totalEarns?lista.totalEarns._sum.value:0,
+      totalGastoMesAnterior: lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0,
+      totalGastoMesAtual: lista.totalExpenses?lista.totalExpenses._sum.value:0,
+      saldoMesAtual: ((lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0)
+          -(lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0))
+        +
+        (
+          (lista.totalEarns?lista.totalEarns._sum.value:0)
+          -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
+    };    
+    setAccountTotal(resumeTotal);
+    console.log(lista);
+    console.log(resumeTotal);
+  }
 
   useMemo(()=>{
-    if(accounts){      
-      let array = accounts.map((item)=> {return{...item, value: item.name + "/" + item.type}});
-      setAccountOption({value: account, setValue: setAccount, values:  array, handleChange: handleChangeAccount});
-    }
-    if(periods){
-      let array = periods.map((item)=> {return{...item, value: item.month + "/" + item.year}});
-      setPeriod(array[1]);
-      setPeriodOption({value: period, setValue: setPeriod,  values: array , handleChange: handleChangePeriod});
-    }      
+    let lista =undefined;
+    if(accountResumeList===undefined ) lista = accountResume;
+    else lista = accountResumeList;
+    //Tratamento dos dados
+    let dados = lista.extrato.map((item, index) => {
+      return {...item,
+          valorMoeda: item.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+        }
+    });
+    
+    setRest({columns: columns, data: dados, 
+      options:{
+        pageSize:10
+      }
+    });
+    setAccountTotal({
+      totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
+      totalGanhoMesAtual: lista.totalEarns?lista.totalEarns._sum.value:0,
+      totalGastoMesAnterior: lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0,
+      totalGastoMesAtual: lista.totalExpenses?lista.totalExpenses._sum.value:0,
+      saldoMesAtual: ((lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0)
+          -(lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0))
+        +
+        (
+          (lista.totalEarns?lista.totalEarns._sum.value:0)
+          -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
+    });
   }, []);
-  Modal.setAppElement('#__next'); //Verificado no código do next (id)
-  const defaultMaterialTheme = createTheme();
+
+  useMemo(()=>{
+    refresh();
+  },[account, period]);
+  
+  const montaComboPeriodo = useMemo(()=>(<CompleteComboBox {...periodOption}/>), [periodOption]);
+  const montaComboConta = useMemo(()=>(<CompleteComboBox {...accountOption}/>), [accountOption]);
+  const montaTabelaExtrato = useMemo(()=>{
+    return(<GenericTable rest={rest} selectedRow={selectExtrato} setSelectedRow={setSelectExtrato} />);
+  }, [accountResumeList]);
+  Modal.setAppElement('#__next'); //Verificado no código do next (id)  
+  
   return(
     <>
       <Head>
         <title>Painel - Controle de Gastos</title>
       </Head>
       <div>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-        />
+        
         <Header/>
         <main className={styles.container}>
           <div  className={styles.choiceTop}>
-            <CompleteComboBox {...periodOption}/>
-            <CompleteComboBox {...accountOption}/>
+            {montaComboPeriodo}
+            {montaComboConta}
           </div>
-          <ThemeProvider theme={defaultMaterialTheme}>
-            <MaterialTable
-              columns={columns}
-              data={accountResume.extrato}
-              title='Extrato'
-              onRowClick={(evt, selectedRow) =>
-                setSelectedRow(selectedRow.tableData.id)
-              }
-              options={{
-                search: true,
-                rowStyle: rowData => ({
-                  backgroundColor:
-                    selectedRow === rowData.tableData.id ? '#67aeae' : '#FFF'
-                })
-              }}
-            />
-          </ThemeProvider>
+          <div  className={styles.choiceTopRefresh}>
+            <label className={styles.labelSaldoApresentacao}>Mês Anterior</label>
+            <label className={styles.labelSaldo}>Renda:{accountTotal?accountTotal.totalGanhoMesAnterior?accountTotal.totalGanhoMesAnterior.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}):"-":"-"}</label>
+            <label className={styles.labelSaldo}>Gasto:{accountTotal?accountTotal.totalGastoMesAnterior?accountTotal.totalGastoMesAnterior.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}):"-":"-"}</label>            
+            <label className={styles.labelSaldo}></label>
+          </div>
+          <div  className={styles.choiceTopRefresh}>
+            <label className={styles.labelSaldoApresentacao}>Mês Atual</label>
+            <label className={styles.labelSaldo}>Renda:{accountTotal?accountTotal.totalGanhoMesAtual?accountTotal.totalGanhoMesAtual.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}):"-":"-"}</label>
+            <label className={styles.labelSaldo}>Gasto:{accountTotal?accountTotal.totalGastoMesAtual?accountTotal.totalGastoMesAtual.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}):"-":"-"}</label>
+            {accountTotal?accountTotal.saldoMesAtual>0?
+              <label className={styles.labelSaldoGreen}>Saldo:{accountTotal?accountTotal.saldoMesAtual?accountTotal.saldoMesAtual.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}):"-":"-"}</label>            
+            :
+              <label className={styles.labelSaldoRed}>Saldo:{accountTotal?accountTotal.saldoMesAtual?accountTotal.saldoMesAtual.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}):"-":"-"}</label>
+            :
+              <label className={styles.labelSaldo}>Saldo:-</label>}
+          </div>
         </main>
+        {montaTabelaExtrato}
       </div>
     </>
   )
@@ -99,7 +183,7 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
   const responsePeriods = await apiClient.get('/period');
   const responseAccounts = await apiClient.get('/account');
   let retorno = {props:{}};
-  if(responsePeriods.data) retorno.props = {...retorno.props, periods: responsePeriods.data}
+  if(responsePeriods.data) retorno.props = {...retorno.props, periods: responsePeriods.data.reverse()}
   if(responseAccounts.data) retorno.props = {...retorno.props, accounts: responseAccounts.data}
 
   let responseAccountResume = undefined;
@@ -107,19 +191,19 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
     let jsonResume = {
       expense:{
         account:{
-          name: "Inter",
-          type: "Cartão de Crédito"
+          name: responseAccounts.data[0].name,
+          type: responseAccounts.data[0].type
         }
       },
       earn:{
         account:{
-          name: "Inter",
-          type: "Cartão de Crédito"
+          name: responseAccounts.data[0].name,
+          type: responseAccounts.data[0].type
         }
       },
       period:{
-        month: 12,
-        year: 2022
+        month: responsePeriods.data[0].month,
+        year: responsePeriods.data[0].year
       }
     };
     responseAccountResume = await apiClient.post('/account/resume', jsonResume)

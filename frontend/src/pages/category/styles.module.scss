@@ -1,0 +1,27 @@
+.container{
+    max-width: 720px;
+    margin: 4rem auto;
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.container h1{
+    color: var(--white);
+}
+
+.containerHeader{
+    display: flex;
+    flex-direction: row;
+    button{
+        background: transparent;
+        border: 0;
+        margin-left: 1rem;
+        transition: transform 0.8s;
+
+        &:hover{
+            transform: scale(1.2);
+        }        
+    }
+
+}
