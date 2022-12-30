@@ -29,7 +29,7 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
   const[accountOption, setAccountOption] = useState<AccountProps>();
   const [accountResumeList, setAccountResumeList] =useState<any>();
   const [accountTotal, setAccountTotal] = useState();
-
+  const [modaVisible, setModalVisible] = useState(false);
   const apiClient = setupAPIClient();
   let columns= [
     { title: 'Data', field: 'dateFormat' },
@@ -77,7 +77,9 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
         }
     });
     setAccountResumeList(dados);
-    setRest({columns: columns, data: dados, 
+    setRest({columns: columns, 
+      data: dados, 
+      setData: setAccountResumeList,
       options:{
         pageSize:10
       }
@@ -96,49 +98,53 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
           -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
     };    
     setAccountTotal(resumeTotal);
-    console.log(lista);
-    console.log(resumeTotal);
+
   }
 
   useMemo(()=>{
     let lista =undefined;
     if(accountResumeList===undefined ) lista = accountResume;
     else lista = accountResumeList;
-    //Tratamento dos dados
-    let dados = lista.extrato.map((item, index) => {
-      return {...item,
-          valorMoeda: item.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+    if(lista.extrato){
+      //Tratamento dos dados
+      let dados = lista.extrato.map((item, index) => {
+        return {...item,
+            valorMoeda: item.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+          }
+      });
+      
+      setRest({columns: columns, 
+        data: dados, 
+        setData: setAccountResumeList,
+        options:{
+          pageSize:10
         }
-    });
+      });
+      setAccountTotal({
+        totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
+        totalGanhoMesAtual: lista.totalEarns?lista.totalEarns._sum.value:0,
+        totalGastoMesAnterior: lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0,
+        totalGastoMesAtual: lista.totalExpenses?lista.totalExpenses._sum.value:0,
+        saldoMesAtual: ((lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0)
+            -(lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0))
+          +
+          (
+            (lista.totalEarns?lista.totalEarns._sum.value:0)
+            -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
+      });
+    }
     
-    setRest({columns: columns, data: dados, 
-      options:{
-        pageSize:10
-      }
-    });
-    setAccountTotal({
-      totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
-      totalGanhoMesAtual: lista.totalEarns?lista.totalEarns._sum.value:0,
-      totalGastoMesAnterior: lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0,
-      totalGastoMesAtual: lista.totalExpenses?lista.totalExpenses._sum.value:0,
-      saldoMesAtual: ((lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0)
-          -(lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0))
-        +
-        (
-          (lista.totalEarns?lista.totalEarns._sum.value:0)
-          -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
-    });
   }, []);
 
   useMemo(()=>{
     refresh();
   },[account, period]);
-  
+
   const montaComboPeriodo = useMemo(()=>(<CompleteComboBox {...periodOption}/>), [periodOption]);
   const montaComboConta = useMemo(()=>(<CompleteComboBox {...accountOption}/>), [accountOption]);
   const montaTabelaExtrato = useMemo(()=>{
     return(<GenericTable rest={rest} selectedRow={selectExtrato} setSelectedRow={setSelectExtrato} />);
-  }, [accountResumeList]);
+  }, [selectExtrato, accountResumeList]);
   Modal.setAppElement('#__next'); //Verificado no código do next (id)  
   
   return(
@@ -173,6 +179,7 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
           </div>
         </main>
         {montaTabelaExtrato}
+        {modaVisible && <ModalDash isOpen={modaVisible} onRequestClose={(()=>{setModalVisible(false)})}/>}
       </div>
     </>
   )

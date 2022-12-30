@@ -3,7 +3,6 @@ import MaterialTableProps from 'material-table';
 import { AddBox, ArrowDownward } from "@material-ui/icons";
 import { ThemeProvider, createTheme } from '@mui/material';
 
-
 export type GenericTableProps = {
     rest: MaterialTableProps
     selectedRow: any
@@ -25,18 +24,21 @@ export function GenericTable({rest, selectedRow, setSelectedRow, corSelecionada,
         />
         <MaterialTable          
           data={rest.data}
+          setData={rest.setData}
           columns={rest.columns}
           title={rest.title}
-          onRowClick={(evt, selectedRow) =>{            
-            setSelectedRow(selectedRow.tableData);
-          }
+            onRowClick={(evt, item) =>{
+              setSelectedRow(item);
+            }
           }
           options={{...rest.options,
             search: true,            
-            rowStyle: rowData => ({
+            rowStyle: rowData => {
+              return ({
                 backgroundColor:
-                (selectedRow ? (selectedRow.id === rowData.tableData.id ? corSelecionada : corNaoSelecionada) : corNaoSelecionada)
-            })
+                (selectedRow ? (selectedRow.id === rowData.id ? corSelecionada : corNaoSelecionada) : corNaoSelecionada)
+              });
+            }
           }}
           
         />
