@@ -1,5 +1,6 @@
 import { setupAPIClient } from './api'
 
+
 export type PeriodProps = {
     id: string;
     month: number;

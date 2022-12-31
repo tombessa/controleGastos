@@ -1,4 +1,4 @@
-import{useState, useMemo} from 'react';
+import React, {useState, useMemo} from 'react';
 import {canSSRAuth} from "../../utils/canSSRAuth";
 import Head from 'next/head';
 import {Header} from '../../components/Header';
@@ -6,37 +6,35 @@ import styles from './styles.module.scss'
 import { setupAPIClient } from "../../services/api";
 import Modal from 'react-modal';
 import { toast } from "react-toastify";
-import { ListPeriodProps, ListAccountProps, AccountResumeProps } from "../../services/apiClient";
+import {ListPeriodProps, ListAccountProps, AccountResumeProps, CategoryProps} from "../../services/apiClient";
 import { ComboBox, CompleteComboBox, OptionCombo } from "../../components/ui/ComboBox";
-import { GenericForm } from '../../components/ui/Form';
 import { GenericTable } from '../../components/ui/Table';
 import moment from 'moment';
+
 
 
 export type HomeProps = {
   periods: ListPeriodProps;
   accounts: ListAccountProps;
   accountResume: AccountResumeProps;
+  earns: CategoryProps;
+  expenses: CategoryProps;
 }
 
 
-export default function Dashboard({periods, accounts, accountResume}: HomeProps){
+export default function Dashboard({periods, accounts, accountResume, earns, expenses}: HomeProps){
   const [selectExtrato, setSelectExtrato] = useState(null);
-  
   const [period, setPeriod] = useState();
   const [account, setAccount] = useState();  
-  const[periodOption, setPeriodOption] = useState<PeriodProps>();
-  const[accountOption, setAccountOption] = useState<AccountProps>();
+  const [periodOption, setPeriodOption] = useState<PeriodProps>();
+  const [accountOption, setAccountOption] = useState<AccountProps>();
   const [accountResumeList, setAccountResumeList] =useState<any>();
   const [accountTotal, setAccountTotal] = useState();
   const [modaVisible, setModalVisible] = useState(false);
+  const [categories, setCategories] = useState();
+  const [columns, setColumns]=useState([]);
+
   const apiClient = setupAPIClient();
-  let columns= [
-    { title: 'Data', field: 'dateFormat' },
-    { title: 'Categoria', field: 'category.name' },
-    { title: 'Descrição', field: 'description' },
-    { title: 'Valor', field: 'valorMoeda' }
-  ];
   const [rest, setRest] = useState();
 
   function refresh(){
@@ -50,8 +48,52 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
     }
     load();
   }
+  const handleRowUpdate = (newData: RowData, oldData: RowData, resolve: Promise<any>) => {
+    let isEarn=false;
+    let dateArray = newData.dateFormat.split("/");
+    let newDate = moment(new Date(dateArray[2], dateArray[1]-1, dateArray[0])).format('YYYY-MM-DD');
+    newDate = newDate.concat("T06:00:00.000Z");
+    let updateJson = {id: newData.id,
+      date: newDate,
+      account: {
+        name: account ? account.name: accounts[0].name,
+        type: account ? account.type: accounts[0].type
+      }};
+
+
+    if(newData.category_id!==oldData.category_id){
+      let filterEarn = earns.filter(t => t.id === newData.category_id);
+      let filterExpense = expenses.filter(t => t.id === newData.category_id);
+      isEarn = (filterEarn.length>0);
+      if(isEarn){updateJson={...updateJson, category_id: filterEarn[0].id}}
+      else {updateJson={...updateJson, category_id: filterExpense[0].id}}
+    }else{
+      let filterEarn = earns.filter(t => t.id === oldData.category_id);
+      let filterExpense = expenses.filter(t => t.id === oldData.category_id);
+      isEarn = (filterEarn.length>0);
+      if(isEarn){updateJson={...updateJson, category_id: filterEarn[0].id}}
+      else {updateJson={...updateJson, category_id: filterExpense[0].id}}
+    }
+    if(newData.description!==oldData.description){
+      updateJson = {...updateJson, description: newData.description}
+    }else updateJson = {...updateJson, description: oldData.description}
+    if(newData.value!==oldData.value){
+      updateJson = {...updateJson, value: newData.value}
+    }else updateJson = {...updateJson, value: oldData.value}
+    let url;
+    if(isEarn){url = '/earn';}else {url = '/expense'; updateJson.value = -1*updateJson.value;}
+    console.log(updateJson);
+    console.log(url);
+    const update = apiClient.patch(url, updateJson);
+    load();
+    resolve();
+  }
 
   async function load() {
+    let categoryList = [];
+    for (const item of earns) { categoryList[item.id]= item.name; }
+    for (const item of expenses) { categoryList[item.id]= item.name ;}
+    setCategories(categoryList);
     let jsonResume = {
       expense:{
         account:{
@@ -71,19 +113,36 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
       }        
     };
     let lista = (await apiClient.post('/account/resume', jsonResume)).data;
-    let dados = lista.extrato.map((item, index) => {
-      return {...item,
-          valorMoeda: item.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
-        }
-    });
+    let dados = lista.extrato;
     setAccountResumeList(dados);
-    setRest({columns: columns, 
-      data: dados, 
+    let array = [
+      { title: 'Data', field: 'dateFormat',
+        cellStyle: { width: "10%" },
+        width: "10%",
+        headerStyle: { width: "10%" }},
+      { title: 'Categoria', field: 'category_id', lookup: categoryList,
+        cellStyle: { width: "20%" },
+        width: "20%",
+        headerStyle: { width: "20%" }},
+      { title: 'Descrição', field: 'description',
+        cellStyle: { width: "60%" },
+        width: "60%",
+        headerStyle: { width: "60%" }},
+      { title: 'Valor', field: 'value',
+        cellStyle: { width: "10%" },
+        width: "10%",
+        headerStyle: { width: "10%" }, type:'currency', currencySetting:{ locale: 'pt-br',currencyCode:'BRL', minimumFractionDigits:0, maximumFractionDigits:2}}
+    ];
+    setColumns(array);
+    setRest({columns: array,
+      data: dados,
+      handleRowUpdate: handleRowUpdate,
       setData: setAccountResumeList,
       options:{
         pageSize:10
       }
     });
+
 
     let resumeTotal = {
       totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
@@ -101,20 +160,41 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
 
   }
 
+
   useMemo(()=>{
+    let categoryList = [];
+    for (const item of earns) { categoryList[item.id]= item.name; }
+    for (const item of expenses) { categoryList[item.id]= item.name ;}
+    setCategories(categoryList);
     let lista =undefined;
     if(accountResumeList===undefined ) lista = accountResume;
     else lista = accountResumeList;
     if(lista.extrato){
       //Tratamento dos dados
-      let dados = lista.extrato.map((item, index) => {
-        return {...item,
-            valorMoeda: item.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
-          }
-      });
-      
-      setRest({columns: columns, 
-        data: dados, 
+      let dados = lista.extrato;
+      let array = [
+        { title: 'Data', field: 'dateFormat',
+          cellStyle: { width: "10%" },
+          width: "10%",
+          headerStyle: { width: "10%" }},
+        { title: 'Categoria', field: 'category_id', lookup: categoryList,
+          cellStyle: { width: "20%" },
+          width: "20%",
+          headerStyle: { width: "20%" }},
+        { title: 'Descrição', field: 'description',
+          cellStyle: { width: "60%" },
+          width: "60%",
+          headerStyle: { width: "60%" }},
+        { title: 'Valor', field: 'value',
+          cellStyle: { width: "10%" },
+          width: "10%",
+          headerStyle: { width: "10%" }, type:'currency', currencySetting:{ locale: 'pt-br',currencyCode:'BRL', minimumFractionDigits:0, maximumFractionDigits:2}}
+      ];
+      setColumns(array);
+
+      setRest({columns: array,
+        data: dados,
+        handleRowUpdate: handleRowUpdate,
         setData: setAccountResumeList,
         options:{
           pageSize:10
@@ -132,6 +212,7 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
             (lista.totalEarns?lista.totalEarns._sum.value:0)
             -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
       });
+
     }
     
   }, []);
@@ -144,7 +225,7 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
   const montaComboConta = useMemo(()=>(<CompleteComboBox {...accountOption}/>), [accountOption]);
   const montaTabelaExtrato = useMemo(()=>{
     return(<GenericTable rest={rest} selectedRow={selectExtrato} setSelectedRow={setSelectExtrato} />);
-  }, [selectExtrato, accountResumeList]);
+  }, [columns, selectExtrato, accountResumeList]);
   Modal.setAppElement('#__next'); //Verificado no código do next (id)  
   
   return(
@@ -178,8 +259,8 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
               <label className={styles.labelSaldo}>Saldo:-</label>}
           </div>
         </main>
+
         {montaTabelaExtrato}
-        {modaVisible && <ModalDash isOpen={modaVisible} onRequestClose={(()=>{setModalVisible(false)})}/>}
       </div>
     </>
   )
@@ -187,11 +268,20 @@ export default function Dashboard({periods, accounts, accountResume}: HomeProps)
 
 export const getServerSideProps = canSSRAuth(async (ctx) => {
   const apiClient = setupAPIClient(ctx);
+  const responseCategory = await apiClient.get('/category');
+
   const responsePeriods = await apiClient.get('/period');
   const responseAccounts = await apiClient.get('/account');
   let retorno = {props:{}};
   if(responsePeriods.data) retorno.props = {...retorno.props, periods: responsePeriods.data.reverse()}
   if(responseAccounts.data) retorno.props = {...retorno.props, accounts: responseAccounts.data}
+
+  //earns
+  const earns = responseCategory.data.filter(item => !item.expense);
+  const expenses = responseCategory.data.filter(item => item.expense);
+  if(responseCategory.data) retorno.props = {...retorno.props, earns: earns}
+  //expenses
+  if(responseCategory.data) retorno.props = {...retorno.props, expenses: expenses}
 
   let responseAccountResume = undefined;
   if((responsePeriods.data)&&(responseAccounts.data)){

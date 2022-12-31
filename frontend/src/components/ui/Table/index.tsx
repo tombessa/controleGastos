@@ -1,7 +1,9 @@
 import MaterialTable from 'material-table';
-import MaterialTableProps from 'material-table';
+import {MaterialTableProps} from 'material-table';
 import { AddBox, ArrowDownward } from "@material-ui/icons";
 import { ThemeProvider, createTheme } from '@mui/material';
+// When using TypeScript 4.x and above
+import type {} from '@mui/x-date-pickers/themeAugmentation';
 
 export type GenericTableProps = {
     rest: MaterialTableProps
@@ -17,6 +19,15 @@ export function GenericTable({rest, selectedRow, setSelectedRow, corSelecionada,
     if(!corNaoSelecionada){corNaoSelecionada='#FFF'}
     if(!rest.title) rest.title=""
     const defaultMaterialTheme = createTheme();
+    let customEditable={};
+    if(rest.handleRowUpdate){
+        customEditable={...customEditable,
+            onRowUpdate: (newData: RowData, oldData?: RowData) =>
+                new Promise((resolve) => {
+                    rest.handleRowUpdate(newData, oldData, resolve);
+                })
+        };
+    }
     return (<ThemeProvider theme={defaultMaterialTheme}>
         <link
           rel="stylesheet"
@@ -26,15 +37,18 @@ export function GenericTable({rest, selectedRow, setSelectedRow, corSelecionada,
           data={rest.data}
           setData={rest.setData}
           columns={rest.columns}
+          editable={customEditable}
           title={rest.title}
             onRowClick={(evt, item) =>{
               setSelectedRow(item);
             }
           }
           options={{...rest.options,
-            search: true,            
+            search: true,
+              filtering: true,
             rowStyle: rowData => {
               return ({
+                  fontSize: 12,
                 backgroundColor:
                 (selectedRow ? (selectedRow.id === rowData.id ? corSelecionada : corNaoSelecionada) : corNaoSelecionada)
               });
