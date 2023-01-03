@@ -74,12 +74,12 @@ router.get('/goalPeriod', isAuthenticated, new ListGoalPeriodController().handle
 router.post('/expense', isAuthenticated, new CreateExpenseController().handle )
 router.patch('/expense', isAuthenticated, new UpdateExpenseController().handle )
 router.get('/expense', isAuthenticated, new ListExpenseController().handle )
-router.delete('/expense', isAuthenticated, new DeleteExpenseController().handle)
+router.patch('/expense/delete', isAuthenticated, new DeleteExpenseController().handle)
 
 //-- ROTAS EARN
 router.post('/earn', isAuthenticated, new CreateEarnController().handle )
 router.patch('/earn', isAuthenticated, new UpdateEarnController().handle )
 router.get('/earn', isAuthenticated, new ListEarnController().handle )
-router.delete('/earn', isAuthenticated, new DeleteExpenseController().handle)
+router.patch('/earn/delete', isAuthenticated, new DeleteExpenseController().handle)
 
 export { router }; 
