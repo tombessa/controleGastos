@@ -31,6 +31,7 @@ import {CreateEarnController} from "./controllers/earn/CreateEarnController";
 import {UpdateEarnController} from "./controllers/earn/UpdateEarnController";
 import {ListEarnController} from "./controllers/earn/ListEarnController";
 import { DeleteExpenseController } from './controllers/expense/DeleteExpenseController';
+import { DeleteEarnController } from './controllers/earn/DeleteEarnController';
 
 const router = Router();
 
@@ -80,6 +81,6 @@ router.patch('/expense/delete', isAuthenticated, new DeleteExpenseController().h
 router.post('/earn', isAuthenticated, new CreateEarnController().handle )
 router.patch('/earn', isAuthenticated, new UpdateEarnController().handle )
 router.get('/earn', isAuthenticated, new ListEarnController().handle )
-router.patch('/earn/delete', isAuthenticated, new DeleteExpenseController().handle)
+router.patch('/earn/delete', isAuthenticated, new DeleteEarnController().handle)
 
 export { router }; 
