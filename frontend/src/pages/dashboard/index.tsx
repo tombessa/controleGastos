@@ -48,74 +48,23 @@ export default function Dashboard({periods, accounts, accountResume, earns, expe
     }
     load();
   }
-  const handleRowUpdate = (newData: RowData, oldData: RowData, resolve: Promise<any>) => {
-    let isEarn=false;
-    let dateArray = newData.dateFormat.split("/");
-    let newDate = moment(new Date(dateArray[2], dateArray[1]-1, dateArray[0])).format('YYYY-MM-DD');
-    newDate = newDate.concat("T06:00:00.000Z");
-    let updateJson = {id: newData.id,
-      date: newDate,
-      account: {
-        name: account ? account.name: accounts[0].name,
-        type: account ? account.type: accounts[0].type
-      }};
 
-
-    if(newData.category_id!==oldData.category_id){
-      let filterEarn = earns.filter(t => t.id === newData.category_id);
-      let filterExpense = expenses.filter(t => t.id === newData.category_id);
-      isEarn = (filterEarn.length>0);
-      if(isEarn){updateJson={...updateJson, category_id: filterEarn[0].id}}
-      else {updateJson={...updateJson, category_id: filterExpense[0].id}}
-    }else{
-      let filterEarn = earns.filter(t => t.id === oldData.category_id);
-      let filterExpense = expenses.filter(t => t.id === oldData.category_id);
-      isEarn = (filterEarn.length>0);
-      if(isEarn){updateJson={...updateJson, category_id: filterEarn[0].id}}
-      else {updateJson={...updateJson, category_id: filterExpense[0].id}}
-    }
-    if(newData.description!==oldData.description){
-      updateJson = {...updateJson, description: newData.description}
-    }else updateJson = {...updateJson, description: oldData.description}
-    if(newData.value!==oldData.value){
-      updateJson = {...updateJson, value: newData.value}
-    }else updateJson = {...updateJson, value: oldData.value}
-    let url;
-    if(isEarn){url = '/earn';}else {url = '/expense'; updateJson.value = -1*updateJson.value;}
-    console.log(updateJson);
-    console.log(url);
-    const update = apiClient.patch(url, updateJson);
-    load();
-    resolve();
-  }
-
-  async function load() {
-    let categoryList = [];
-    for (const item of earns) { categoryList[item.id]= item.name; }
-    for (const item of expenses) { categoryList[item.id]= item.name ;}
-    setCategories(categoryList);
-    let jsonResume = {
-      expense:{
-        account:{
-          name: account ? account.name: accounts[0].name,
-          type: account ? account.type: accounts[0].type
-        }
-      },
-      earn:{
-        account:{
-          name: account ? account.name: accounts[0].name,
-          type: account ? account.type: accounts[0].type
-        }
-      },
-      period:{
-        month: period ? period.month: periods[0].month,
-        year: period ? period.year: periods[0].year,
-      }        
+  function returnResumeTotal(lista){
+    return {
+      totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
+      totalGanhoMesAtual: lista.totalEarns?lista.totalEarns._sum.value:0,
+      totalGastoMesAnterior: lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0,
+      totalGastoMesAtual: lista.totalExpenses?lista.totalExpenses._sum.value:0,
+      saldoMesAtual: ((lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0)
+              -(lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0))
+          +
+          (
+              (lista.totalEarns?lista.totalEarns._sum.value:0)
+              -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
     };
-    let lista = (await apiClient.post('/account/resume', jsonResume)).data;
-    let dados = lista.extrato;
-    setAccountResumeList(dados);
-    let array = [
+  }
+  function returnTableColum(categoryList){
+    return [
       { title: 'Data', field: 'dateFormat',
         cellStyle: { width: "10%" },
         width: "10%",
@@ -133,30 +82,100 @@ export default function Dashboard({periods, accounts, accountResume, earns, expe
         width: "10%",
         headerStyle: { width: "10%" }, type:'currency', currencySetting:{ locale: 'pt-br',currencyCode:'BRL', minimumFractionDigits:0, maximumFractionDigits:2}}
     ];
+  }
+  function returnJsonQuery(account, period){
+    return {
+      expense:{
+        account:{
+          name: account ? account.name: accounts[0].name,
+          type: account ? account.type: accounts[0].type
+        }
+      },
+      earn:{
+        account:{
+          name: account ? account.name: accounts[0].name,
+          type: account ? account.type: accounts[0].type
+        }
+      },
+      period:{
+        month: period ? period.month: periods[0].month,
+        year: period ? period.year: periods[0].year,
+      }
+    };
+  }
+
+  function isEarn(category_id: string):Boolean{
+    let filterEarn = earns.filter(t => t.id === category_id);
+    let filterExpense = expenses.filter(t => t.id === category_id);
+    return (filterEarn.length>0);
+  }
+
+  const handleRowDelete = 
+
+  const handleRowAdd = (newData: RowData, resolve: Promise<any>) => {
+    let bNewEarn=isEarn(newData.category_id);
+    let dateArray = newData.dateFormat.split("/");
+    let newDate = moment(new Date(dateArray[2], dateArray[1]-1, dateArray[0])).format('YYYY-MM-DD');
+    newDate = newDate.concat("T06:00:00.000Z");
+    let addJson = {
+      category_id: newData.category_id,
+      description: newData.description,
+      value: newData.value,
+      date: newDate,
+      account: {
+        name: account ? account.name: accounts[0].name,
+        type: account ? account.type: accounts[0].type
+      }
+    };
+    const add = apiClient.post((bNewEarn? '/earn' : '/expense'), addJson);
+    load();
+    resolve();
+  }
+
+  const handleRowUpdate = (newData: RowData, oldData: RowData, resolve: Promise<any>) => {
+    let bNewEarn=isEarn(newData.category_id);
+    let bOldEarn=isEarn(oldData.category_id);
+    let dateArray = newData.dateFormat.split("/");
+    let newDate = moment(new Date(dateArray[2], dateArray[1]-1, dateArray[0])).format('YYYY-MM-DD');
+    newDate = newDate.concat("T06:00:00.000Z");
+    let updateJson = {id: newData.id,
+      date: newDate,
+      account: {
+        name: account ? account.name: accounts[0].name,
+        type: account ? account.type: accounts[0].type
+      }};
+    updateJson={...updateJson, category_id: (newData.category_id?newData.category_id: oldData.category_id)};
+    updateJson={...updateJson, description: (newData.description?newData.description: oldData.description)};
+    updateJson={...updateJson, value: (newData.value?newData.value: oldData.value)};
+
+    let url;
+    if(bNewEarn || bOldEarn){url = '/earn';}else {url = '/expense'; updateJson.value = -1*updateJson.value;}
+    const update = apiClient.patch(url, updateJson);
+    load();
+    resolve();
+  }
+
+  async function load() {
+    let categoryList = [];
+    for (const item of earns) { categoryList[item.id]= item.name; }
+    for (const item of expenses) { categoryList[item.id]= item.name ;}
+    setCategories(categoryList);
+
+    let lista = (await apiClient.post('/account/resume', returnJsonQuery(account, period))).data;
+    let dados = lista.extrato;
+    setAccountResumeList(dados);
+    let array = returnTableColum(categoryList);
     setColumns(array);
     setRest({columns: array,
       data: dados,
+      handleRowAdd: handleRowAdd,
       handleRowUpdate: handleRowUpdate,
       setData: setAccountResumeList,
       options:{
         pageSize:10
       }
     });
-
-
-    let resumeTotal = {
-      totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
-      totalGanhoMesAtual: lista.totalEarns?lista.totalEarns._sum.value:0,
-      totalGastoMesAnterior: lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0,
-      totalGastoMesAtual: lista.totalExpenses?lista.totalExpenses._sum.value:0,
-      saldoMesAtual: ((lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0)
-          -(lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0))
-        +
-        (
-          (lista.totalEarns?lista.totalEarns._sum.value:0)
-          -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
-    };    
-    setAccountTotal(resumeTotal);
+    setAccountTotal(returnResumeTotal(lista));
 
   }
 
@@ -172,47 +191,18 @@ export default function Dashboard({periods, accounts, accountResume, earns, expe
     if(lista.extrato){
       //Tratamento dos dados
       let dados = lista.extrato;
-      let array = [
-        { title: 'Data', field: 'dateFormat',
-          cellStyle: { width: "10%" },
-          width: "10%",
-          headerStyle: { width: "10%" }},
-        { title: 'Categoria', field: 'category_id', lookup: categoryList,
-          cellStyle: { width: "20%" },
-          width: "20%",
-          headerStyle: { width: "20%" }},
-        { title: 'Descrição', field: 'description',
-          cellStyle: { width: "60%" },
-          width: "60%",
-          headerStyle: { width: "60%" }},
-        { title: 'Valor', field: 'value',
-          cellStyle: { width: "10%" },
-          width: "10%",
-          headerStyle: { width: "10%" }, type:'currency', currencySetting:{ locale: 'pt-br',currencyCode:'BRL', minimumFractionDigits:0, maximumFractionDigits:2}}
-      ];
-      setColumns(array);
+      setColumns(returnTableColum(categoryList));
 
-      setRest({columns: array,
+      setRest({columns: returnTableColum(categoryList),
         data: dados,
+        handleRowAdd: handleRowAdd,
         handleRowUpdate: handleRowUpdate,
         setData: setAccountResumeList,
         options:{
           pageSize:10
         }
       });
-      setAccountTotal({
-        totalGanhoMesAnterior: lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0,
-        totalGanhoMesAtual: lista.totalEarns?lista.totalEarns._sum.value:0,
-        totalGastoMesAnterior: lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0,
-        totalGastoMesAtual: lista.totalExpenses?lista.totalExpenses._sum.value:0,
-        saldoMesAtual: ((lista.totalEarnsLastPeriod?lista.totalEarnsLastPeriod._sum.value:0)
-            -(lista.totalExpensesLastPeriod?lista.totalExpensesLastPeriod._sum.value:0))
-          +
-          (
-            (lista.totalEarns?lista.totalEarns._sum.value:0)
-            -(lista.totalExpenses?lista.totalExpenses._sum.value:0))
-      });
-
+      setAccountTotal(returnResumeTotal(lista));
     }
     
   }, []);

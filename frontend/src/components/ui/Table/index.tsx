@@ -20,11 +20,27 @@ export function GenericTable({rest, selectedRow, setSelectedRow, corSelecionada,
     if(!rest.title) rest.title=""
     const defaultMaterialTheme = createTheme();
     let customEditable={};
+    if(rest.handleRowAdd){
+        customEditable={...customEditable,
+            onRowAdd: (newData: RowData) =>
+                new Promise((resolve) =>{
+                    rest.handleRowAdd(newData, resolve);
+                })
+        };
+    }
     if(rest.handleRowUpdate){
         customEditable={...customEditable,
             onRowUpdate: (newData: RowData, oldData?: RowData) =>
                 new Promise((resolve) => {
                     rest.handleRowUpdate(newData, oldData, resolve);
+                })
+        };
+    }
+    if(rest.handleRowDelete){
+        customEditable={...customEditable,
+            onRowDelete: (oldData?: RowData) =>
+                new Promise((resolve) => {
+                    rest.handleRowDelete(oldData, resolve);
                 })
         };
     }

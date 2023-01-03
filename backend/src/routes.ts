@@ -30,6 +30,7 @@ import {ListExpenseController} from "./controllers/expense/ListExpenseController
 import {CreateEarnController} from "./controllers/earn/CreateEarnController";
 import {UpdateEarnController} from "./controllers/earn/UpdateEarnController";
 import {ListEarnController} from "./controllers/earn/ListEarnController";
+import { DeleteExpenseController } from './controllers/expense/DeleteExpenseController';
 
 const router = Router();
 
@@ -73,10 +74,12 @@ router.get('/goalPeriod', isAuthenticated, new ListGoalPeriodController().handle
 router.post('/expense', isAuthenticated, new CreateExpenseController().handle )
 router.patch('/expense', isAuthenticated, new UpdateExpenseController().handle )
 router.get('/expense', isAuthenticated, new ListExpenseController().handle )
+router.delete('/expense', isAuthenticated, new DeleteExpenseController().handle)
 
 //-- ROTAS EARN
 router.post('/earn', isAuthenticated, new CreateEarnController().handle )
 router.patch('/earn', isAuthenticated, new UpdateEarnController().handle )
 router.get('/earn', isAuthenticated, new ListEarnController().handle )
+router.delete('/earn', isAuthenticated, new DeleteExpenseController().handle)
 
 export { router }; 
