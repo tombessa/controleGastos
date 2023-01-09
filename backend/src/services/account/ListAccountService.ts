@@ -46,6 +46,9 @@ class ListAccountService{
       },
       
     }
+
+    let usePeriod = false; 
+    if(period) usePeriod = true;
     
     query.where = {...query.where, created_by:created_by};
     query.where = {...query.where, name:expense.account.name};
@@ -54,25 +57,34 @@ class ListAccountService{
     //Adding the Resume
     let account = earn.account;
     const earns = await new ListEarnService().list({period, account, created_by});
-    const totalEarns = await new ListEarnService().resumByPeriod({period, account, created_by});
-    const paramEarnLast = {period: this.lastPeriod(period), account: account, created_by: created_by} as EarnResumeAccountRequest;
-    const totalEarnsLastPeriod = await new ListEarnService().resumByPeriod(paramEarnLast);
+    let totalEarns = undefined;
+    let totalEarnsLastPeriod = undefined;
+    let totalEarnsUntilLastPeriod = await new ListEarnService().resumUntilPeriod({period, account, created_by});
+    if(usePeriod){
+      totalEarns = await new ListEarnService().resumByPeriod({period, account, created_by});
+      const paramEarnLast = {period: this.lastPeriod(period), account: account, created_by: created_by} as EarnResumeAccountRequest;
+      totalEarnsLastPeriod = await new ListEarnService().resumByPeriod(paramEarnLast);
+    }
 
 
     account = expense.account;
     const expenses = await new ListExpenseService().list({period, account, created_by});
     expenses.forEach(t=> t.value = -1*t.value);
-    const totalExpenses = await new ListExpenseService().resumByPeriod({period, account, created_by});
-
-    const paramExpenseLast = {period: this.lastPeriod(period), account: account, created_by: created_by} as ExpenseResumeAccountRequest;
-    const totalExpensesLastPeriod = await new ListExpenseService().resumByPeriod(paramEarnLast);
+    let totalExpenses = undefined;
+    let totalExpensesLastPeriod = undefined;
+    let totalExpensesUntilLastPeriod = await new ListExpenseService().resumUntilPeriod({period, account, created_by});
+    if(usePeriod){
+      totalExpenses = await new ListExpenseService().resumByPeriod({period, account, created_by});
+      const paramExpenseLast = {period: this.lastPeriod(period), account: account, created_by: created_by} as ExpenseResumeAccountRequest;
+      totalExpensesLastPeriod = await new ListExpenseService().resumByPeriod(paramExpenseLast);
+    }
 
     const extrato = [];
     earns.forEach(t => extrato.push({...t, dateFormat: this.formatDate(t.date)}));
     expenses.forEach(t => extrato.push({...t, dateFormat: this.formatDate(t.date)}));
     extrato.sort((a,b) => (a.date.getDate() > b.date.getDate()) ? 1 : ((b.date.getDate() > a.date.getDate()) ? -1 : 0));
     
-    return {accountReturn, totalEarnsLastPeriod, totalEarns, totalExpensesLastPeriod, totalExpenses, extrato};
+    return {accountReturn, totalEarnsUntilLastPeriod, totalEarnsLastPeriod, totalEarns, totalExpensesUntilLastPeriod, totalExpensesLastPeriod, totalExpenses, extrato};
   }
 
   async execute({id,type,name, created_by}:AccountRequest){

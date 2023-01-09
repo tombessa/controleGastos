@@ -35,10 +35,13 @@ class ListExpenseService{
   async list({period, account, created_by}: ExpenseResumeAccountRequest){
     let goalPeriodList = [];
     if((!account.name)&&(!account.type)) new Error("Account invalid")
-    if(period){
-      const goalPeriodService = new ListGoalPeriodService();
+    
+    const goalPeriodService = new ListGoalPeriodService();
+    if(period){      
       const goalPeriods = await goalPeriodService.execute({period, created_by});
-
+      if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
+    }else{
+      const goalPeriods = await goalPeriodService.execute({created_by});
       if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
     }
 
@@ -62,6 +65,30 @@ class ListExpenseService{
     if(period){
       const goalPeriodService = new ListGoalPeriodService();
       const goalPeriods = await goalPeriodService.execute({period, created_by});
+
+      if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
+    }
+
+    const expense = await prismaClient.expense.aggregate( {
+      _sum:{
+        value: true,
+      },
+      where:{
+        goal_period_id: {in: goalPeriodList},
+        account: {name: account.name, type: account.type},
+        created_by: created_by
+      }
+    });
+    return expense;
+  }
+
+  async resumUntilPeriod({period, account, created_by}: ExpenseResumeAccountRequest){
+    let goalPeriodList = [];
+    if((!account.name)&&(!account.type)) new Error("Account invalid")
+    if(period){
+      const period_compare = "<";
+      const goalPeriodService = new ListGoalPeriodService();
+      const goalPeriods = await goalPeriodService.execute({period, period_compare, created_by});
 
       if(goalPeriods.length>0) goalPeriods.forEach(itemPeriod => goalPeriodList.push(itemPeriod.id));
     }

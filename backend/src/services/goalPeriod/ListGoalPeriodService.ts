@@ -1,6 +1,6 @@
 import prismaClient from "../../prisma";
 import { CategoryRequest } from "../category/ListCategoryService";
-import { PeriodRequest } from "../period/ListPeriodService";
+import { ListPeriodService, PeriodRequest } from "../period/ListPeriodService";
 
 interface GoalPeriodRequest{
   id?: string,
@@ -9,13 +9,33 @@ interface GoalPeriodRequest{
   period_id?: string;
   amount_compare?: string;
   period?: PeriodRequest;
+  period_compare?: string;
   category?: CategoryRequest;
   created_by: string;
 }
 
 
 class ListGoalPeriodService{
-  async execute({ id, amount, category_id, period_id, amount_compare, period, category, created_by}: GoalPeriodRequest){
+
+  generatePeriodFromDate(dateParam: Date, dateLimit: Date, forward: Boolean){    
+    let periodParam = [];
+    
+    if(forward){ //para frente
+      while(dateParam<dateLimit){
+        dateParam.setMonth(dateParam.getMonth() + 1);
+        periodParam.push({period:{month: dateParam.getMonth()+1, year: dateParam.getFullYear()}});
+        
+      }
+    }else{
+      while(dateParam>dateLimit){
+        dateParam.setMonth(dateParam.getMonth() - 1);
+        periodParam.push({period:{month: dateParam.getMonth()+1, year: dateParam.getFullYear()}});
+      }
+    }
+    return periodParam;
+  }
+
+  async execute({ id, amount, category_id, period_id, amount_compare, period, period_compare, category, created_by}: GoalPeriodRequest){
     
     let query = {
       where:{
@@ -29,9 +49,9 @@ class ListGoalPeriodService{
     if(id) query.where = {...query.where, id:id};
     if((amount)&&(amount_compare==='=')) query.where = {...query.where, amount:amount};
     if((amount)&&(amount_compare==='>='))
-      query.where = {...query.where, amount:{gt:amount-0.01}};
+      query.where = {...query.where, amount:{gte:amount}};
     if((amount)&&(amount_compare==='<='))
-      query.where = {...query.where, amount:{lt:amount+0.01}};
+      query.where = {...query.where, amount:{lte:amount}};
     if((amount)&&(amount_compare==='>'))
       query.where = {...query.where, amount:{gt:amount}};
     if((amount)&&(amount_compare==='<'))
@@ -67,25 +87,46 @@ class ListGoalPeriodService{
         }
       }
     }
-    if(period){
-      if(period.id) query.where = {...query.where, 
-        period:{...period,
-          id: period.id
+    let usePeriodCompare = false;
+    if(period){      
+      if(period_compare) usePeriodCompare = true;
+      if(usePeriodCompare){
+        
+        if((period_compare==='=')&&(period.year)&&(period.month)) query.where = {...query.where, period: {year: period.year, month: period.month}};
+        
+        let queryPeriod;
+        let dateParam = new Date(period.year, period.month-1, 1);
+        
+        if((period_compare==='<=')||(period_compare==='<')){
+          let periodListReturn = await new ListPeriodService().findFirst({created_by});
+          let dateLimit  = new Date(periodListReturn.year, periodListReturn.month-1, 1);
+          
+          let periodParam = this.generatePeriodFromDate(dateParam, dateLimit, false);
+          query.where = {...query.where, OR: periodParam};
+          console.log(query.where);
+        }else new Error("Period Compare Error. Valid: < or <=")
+        
+      }else{
+        if(period.id) query.where = {...query.where, 
+          period:{...period,
+            id: period.id
+          }
         }
-      }
-      if(period.year) query.where = {...query.where, 
-        period:{...period,
-          year: period.year
+        if(period.year) query.where = {...query.where, 
+          period:{...period,
+            year: period.year
+          }
         }
-      }
-      if(period.month) query.where = {...query.where, 
-        period:{...period,
-          month: period.month
+        if(period.month) query.where = {...query.where, 
+          period:{...period,
+            month: period.month
+          }
         }
       }
     }
     
     const goalPeriod = await prismaClient.goalPeriod.findMany(query);
+    
     return goalPeriod;
 
   }
