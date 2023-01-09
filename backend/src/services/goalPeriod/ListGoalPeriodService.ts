@@ -103,7 +103,7 @@ class ListGoalPeriodService{
           
           let periodParam = this.generatePeriodFromDate(dateParam, dateLimit, false);
           query.where = {...query.where, OR: periodParam};
-          console.log(query.where);
+          
         }else new Error("Period Compare Error. Valid: < or <=")
         
       }else{
